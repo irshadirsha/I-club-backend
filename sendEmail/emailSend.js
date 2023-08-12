@@ -19,7 +19,7 @@ const sendEmail = async (recipient, subject, message) => {
 
   try {
     await mailTransporter.sendMail(mailOptions);
-    console.log("Email sent successfully.");
+    console.log("Email sent successfully....");
   } catch (error) {
     console.log("Error sending email:", error);
     throw new Error("Error sending the verification email.");

@@ -15,7 +15,7 @@ const verifyToken =async  (req, res, next) => {
   try {
     const data = jwt.verify(token,process.env.jwtSecretKey);
     req.userId = data.sub;
-    console.log("midd",req.userId);
+     console.log("midddddd",req.userId);
     next();
   } catch (error) {
     console.log(error)

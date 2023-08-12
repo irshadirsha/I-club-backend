@@ -4,6 +4,9 @@ const router = express.Router();
 const userController = require ('../controller/userController')
 const clubController = require ('../controller/clubController')
 const eventController =require ('../controller/eventController')
+const finaceController =require ('../controller/financeController')
+const paymentController = require('../controller/paymentController')
+const notificationController =require ('../controller/NotificationController')
 const verifyToken = require('../middleware/auth')
 router.get('/',userController.userHome)
 
@@ -23,12 +26,29 @@ router.post('/getuser-profile',verifyToken,userController.GetProfile)
 router.post('/createclub',verifyToken,clubController.regclub)
 router.post('/joinclub',verifyToken,clubController.joinClub)
 router.post('/clubhome',verifyToken,clubController.ClubHome)
-
+//CLUB AUTHORITY AND ADD MEMMBERS
+router.get('/get-authority',verifyToken,clubController.GetClubAuthority)
+router.post('/add-member',verifyToken,clubController.AddMember)
+router.post('/get-member',verifyToken,clubController.GetMember)
 
 //EVENT CONTROLLER
 router.post('/add-events',verifyToken,eventController.AddEvents)
 router.post('/get-event',verifyToken,eventController.GetEvents)
 router.post('/delete-event',verifyToken,eventController.DeleteEvent)
+
+// PAMENT CONTROLLER
+router.post('/create-payment',verifyToken,paymentController.MakePayment)
+
+//FINANCE CONTROLLER
+router.get('/get-financedata',verifyToken,finaceController.GetFinaceData)
+router.post('/add-expense',verifyToken,finaceController.AddExpense)
+
+//NOTIFICATION CONTROLLER
+router.post('/send-note',verifyToken,notificationController.SendNote)
+router.get('/get-note',verifyToken,notificationController.GetNote)
+router.post('/delete-note',verifyToken,notificationController.DeleteNote)
+
+
 module.exports = router;
 
 

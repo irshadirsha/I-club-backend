@@ -73,7 +73,7 @@ const userSignup = async (req,res,next)=>{
       }else{     
       
         const hashedPassword = await bcrypt.hash(password, 10);
-      const data= await userCollection.create([{username,email,password:hashedPassword}])
+      const data= await userCollection.create({username,email,password:hashedPassword})
        const token = jwt.sign({ sub: data._id }, process.env.jwtSecretKey, { expiresIn: '3d' });
        res.json({data,token,created:true})
       console.log(token);
