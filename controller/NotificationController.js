@@ -12,7 +12,7 @@ const SendNote = async (req, res, next) => {
             .populate('president').populate('secretory').populate('treasurer');
 
         if (!club) {
-            return res.json({ status: "Club not found" });
+            return res.json({ errors: "Club not found" });
         }
 
         const presidentEmail = club.president?.email;
@@ -61,9 +61,9 @@ const SendNote = async (req, res, next) => {
             });
         }
 
-        res.json({ status: "notification saved to database & mail sent" });
+        res.json({ message: `Notification sent to all Members of ${clubName} ` });
     } catch (error) {
-        console.log("error occur");
+        console.log("error occur in add note");
     }
 };
 
@@ -96,7 +96,7 @@ const DeleteNote= async(req,res,next)=>{
         const {deleteid}=req.body
         console.log("delete ---------id",deleteid)
         let deleted = await notificationCollection.deleteOne({_id:deleteid})
-        res.json({deleted,message:"deleted succsess"})
+        res.json({deleted,message:"Notification deleted Successfully"})
     } catch (error) {
       console.log("error occur in note deletion")  
     }

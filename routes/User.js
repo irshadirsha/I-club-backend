@@ -29,7 +29,8 @@ router.post('/clubhome',verifyToken,clubController.ClubHome)
 //CLUB AUTHORITY AND ADD MEMMBERS
 router.get('/get-authority',verifyToken,clubController.GetClubAuthority)
 router.post('/add-member',verifyToken,clubController.AddMember)
-router.post('/get-member',verifyToken,clubController.GetMember)
+router.get('/get-member',verifyToken,clubController.GetMember)
+router.post('/delete-member',verifyToken,clubController.DeleteMember)
 
 //EVENT CONTROLLER
 router.post('/add-events',verifyToken,eventController.AddEvents)

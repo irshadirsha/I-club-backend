@@ -219,12 +219,13 @@ const AddMember=async(req,res,next)=>{
     console.log(club)
     let head = await userCollection.findOne({ _id: userId });
     const user=await userCollection.findOne({email:adduser})
-    console.log(user)
     if (!user) {
       return res.json({
         errors: "There is no such user"
       });
     }
+    const memb=user.username
+    console.log(user)
       if( club.secretory.toString() === user._id.toString() ||
           club.president.toString() === user._id.toString() ||
           club.treasurer.toString() === user._id.toString() ){
@@ -246,26 +247,89 @@ const AddMember=async(req,res,next)=>{
       `I-club Invitation`,
       `Hello,\n\nSubject: Invitation to Join as Member - ${club.clubName}\n\nI hope this email finds you in good spirits. On behalf of ${club.clubName}, our warmest congratulations and invite you to join our club as the new Member.\n\n\n\nBest regards,\n\n${head.username}\n${head.email}`
     );
-    await userCollection.updateOne({ _id: user._id },
-      {$addToSet: {clubs: {$each: [ {
-      clubName: club.clubName,password: club.securityCode,club: club._id,role: "member",
-   }]}}});
+    const isClubAlreadyAdded = user.clubs.some(
+      (club) => club.clubName === clubName
+    );
+
+    if (isClubAlreadyAdded) {
+      return res.json({
+        errors: "User is already a member of this club",
+      });
+    }else{
+      await userCollection.updateOne({ _id: user._id },
+        {$addToSet: {clubs: {$each: [ {
+        clubName: club.clubName,password: club.securityCode,club: club._id,role: "member",
+     }]}}});
+    }
+
+
     console.log("Inserted into user's clubs array");
     }
     let gettingMember = await clubCollection.findById(club._id)
           .populate('members')
-      res.json({message:"Succesfully added the member",data:gettingMember,userRole})
+      res.json({message:`Succesfully added ${memb} to club`,data:gettingMember})
   } catch (error) {
     console.log("addmember Error occur")
   }
 }
 
 const GetMember=async(req,res,next)=>{
-  const { clubName } = req.query;
-  const userId=req.userId
-  console.log("getmember",clubName,userId);
+  try {
+    const { clubName } = req.query;
+    const userId=req.userId
+    console.log("getmember",clubName,userId);
+    const userExist=await userCollection.findOne({_id:userId})
+    const clubExist=await clubCollection.findOne({clubName:clubName}).populate('members')
+    console.log("-------------------",clubExist)
+    const userRole = userExist.clubs.find(clubItem => clubItem.club.toString() === clubExist._id.toString())?.role;
+    if (!userRole) {
+        return res.json({ error: "User role not found for the club" });
+    }
+    res.json({clubExist,userRole})
+  } catch (error) {
+    console.log("error occur in get member")
+  }
 }
-module.exports = { regclub, joinClub,ClubHome,GetClubAuthority,AddMember,GetMember}
+const DeleteMember=async(req,res,next)=>{
+  try {
+    const {id,clubName}=req.body
+    const userId=req.userId
+    const user=await userCollection.findOne({_id:userId})
+    console.log(id,clubName);
+    const memberdlt=await userCollection.findOne({_id:id})
+    const club = await clubCollection.updateOne({clubName:clubName},{$pull:{members:id}})
+   console.log(club);
+  
+   const memb=memberdlt.username
+    sendEmail(
+      memberdlt.email,
+      `I-club `,
+      `Hello,\n\nSubject: Membership cancel- ${clubName}\n\n Your membership has been cancelled from ${clubName},\n\n\n\nBest regards,\n\n${user.username}\n${user.email}`
+    );
+    const clubs = await clubCollection.findOne({clubName:clubName})
+    const clubIdAsString = clubs._id.toString();
+
+    // Remove the specific club object from the user's clubs array
+    await userCollection.updateOne(
+      { _id: id },
+      { $pull: { clubs: { club: clubIdAsString } } }
+    );
+    
+    return res.json({message:`Successfully removed ${memb}  from club`})
+    
+    
+    }catch (error) {
+      console.error(error);
+      res.json({ errors: 'An error occurred during member deletion' });
+    }
+}
+module.exports = { regclub,
+                   joinClub,
+                   ClubHome,
+                   GetClubAuthority,
+                   AddMember,
+                   GetMember,
+                   DeleteMember}
 
 
 
@@ -480,3 +544,62 @@ module.exports = { regclub, joinClub,ClubHome,GetClubAuthority,AddMember,GetMemb
 //     res.json({ error, message: "An error occurred" });
 //   }
 // };
+
+
+
+//////ADDMEMBER///////
+// const AddMember=async(req,res,next)=>{
+//   try {
+//     const { clubName, adduser } = req.body;
+//     const userId=req.userId;
+//     console.log("ADDMEMMBERRR",clubName,userId,adduser);
+//     const club=await clubCollection.findOne({clubName:clubName})
+//     console.log(club)
+//     let head = await userCollection.findOne({ _id: userId });
+//     const user=await userCollection.findOne({email:adduser})
+//     const memb=user.username
+//     console.log(user)
+//     if (!user) {
+//       return res.json({
+//         errors: "There is no such user"
+//       });
+//     }
+//       if( club.secretory.toString() === user._id.toString() ||
+//           club.president.toString() === user._id.toString() ||
+//           club.treasurer.toString() === user._id.toString() ){
+//         return res.json({
+//           errors: "You are a main part of this club so, can't add you as a member"
+//         });
+//     }
+//     if (club.members.includes(user._id)) {
+//       return res.json({
+//         errors: "User is already a member of this club",
+//       });
+//     } else{
+//       await clubCollection.updateOne(
+//         { _id:club._id},
+//         { $addToSet: { members: user._id } }
+//       );
+//       sendEmail(
+//       user.email,
+//       `I-club Invitation`,
+//       `Hello,\n\nSubject: Invitation to Join as Member - ${club.clubName}\n\nI hope this email finds you in good spirits. On behalf of ${club.clubName}, our warmest congratulations and invite you to join our club as the new Member.\n\n\n\nBest regards,\n\n${head.username}\n${head.email}`
+//     );
+//     const isClubPresent = user.clubs.some(
+//       (club) => club.clubName === club.clubName && club.club.toString() === club._id.toString()
+//     );
+//     if(!isClubPresent){
+//       await userCollection.updateOne({ _id: user._id },
+//         {$addToSet: {clubs: {$each: [ {
+//         clubName: club.clubName,password: club.securityCode,club: club._id,role: "member",
+//      }]}}});
+//     }
+//     console.log("Inserted into user's clubs array");
+//     }
+//     let gettingMember = await clubCollection.findById(club._id)
+//           .populate('members')
+//       res.json({message:`Succesfully added ${memb} to club`,data:gettingMember})
+//   } catch (error) {
+//     console.log("addmember Error occur")
+//   }
+// }
