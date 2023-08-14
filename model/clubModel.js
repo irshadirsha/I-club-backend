@@ -39,7 +39,11 @@ const clubSchema=new mongoose.Schema({
         type:Boolean,
         default:false    
       },
-      about:{
+      clubimg:{
+        type:String,
+        default:null
+      },
+      description:{
         type:String,
         default:null
       },

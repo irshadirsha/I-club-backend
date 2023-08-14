@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const nodemailer = require("nodemailer");
 const sendEmail = require('../sendEmail/emailSend')
 const { BulkWriteOperation } = require('mongodb');
+const postCollection = require('../model/clubPostModel')
 const bcrypt = require('bcrypt');
 
 const regclub = async (req, res, next) => {
@@ -323,13 +324,70 @@ const DeleteMember=async(req,res,next)=>{
       res.json({ errors: 'An error occurred during member deletion' });
     }
 }
+
+const AddClubProfile=async (req,res,next)=>{
+  try {
+    const {clubName,imageUrl}=req.body
+    console.log(imageUrl,clubName);
+   await clubCollection.updateOne({clubName:clubName},{$set:{clubimg:imageUrl}})
+   console.log("image updated successfully");
+   return res.json({status:true,message:"Image added successfully"})
+  } catch (error) {
+    console.log("error occur in club profile adding")
+  }
+}
+
+const AddClubPost = async (req,res,next)=>{
+  try {
+    const {clubName,postimageUrl,description}=req.body
+    console.log(clubName,postimageUrl,description)
+     const club = await clubCollection.findOne({clubName:clubName})
+    if (!club) {
+      return res.json({ message: "Club not found" });
+    }
+    const newPost = new postCollection({
+      clubName:club._id,
+      postimg:postimageUrl,
+      desc:description
+    })
+    await newPost.save()
+    res.json({message:"club post added successfully"})
+  } catch (error) {
+    console.log("error occur in addpostclub")
+  }
+
+}
+
+const GetClubProfile = async (req,res,next)=>{
+  try {
+    const { clubName } = req.query;
+    const userId = req.userId;
+    console.log("get profile",clubName,userId);
+    const user=await userCollection.findOne({_id:userId})
+    const clubExist=await clubCollection.findOne({clubName:clubName}).populate('members')
+    console.log(clubExist)
+    const userRole = user.clubs.find(clubItem => clubItem.club.toString() === clubExist._id.toString())?.role;
+      if (!userRole) {
+          return res.json({ errors: "User role not found for the club" });
+      }
+      const postdata=await postCollection.find({clubName:clubExist._id})
+      console.log(postdata)
+      // const memberCount = clubExist.members.length;
+      res.json({clubExist,userRole,postdata})   
+  } catch (error) {
+    console.log("error occr in get profiledata")
+  }
+}
 module.exports = { regclub,
                    joinClub,
                    ClubHome,
                    GetClubAuthority,
                    AddMember,
                    GetMember,
-                   DeleteMember}
+                   DeleteMember,
+                   AddClubProfile,
+                   AddClubPost,
+                   GetClubProfile}
 
 
 

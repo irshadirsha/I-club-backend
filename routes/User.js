@@ -26,12 +26,17 @@ router.post('/getuser-profile',verifyToken,userController.GetProfile)
 router.post('/createclub',verifyToken,clubController.regclub)
 router.post('/joinclub',verifyToken,clubController.joinClub)
 router.post('/clubhome',verifyToken,clubController.ClubHome)
+
 //CLUB AUTHORITY AND ADD MEMMBERS
 router.get('/get-authority',verifyToken,clubController.GetClubAuthority)
 router.post('/add-member',verifyToken,clubController.AddMember)
 router.get('/get-member',verifyToken,clubController.GetMember)
 router.post('/delete-member',verifyToken,clubController.DeleteMember)
 
+// CLUB PROFILE
+router.post('/add-clubprofile',verifyToken,clubController.AddClubProfile)
+router.post('/add-clubpost',verifyToken,clubController.AddClubPost)
+router.get('/get-clubprofile',verifyToken,clubController.GetClubProfile)
 //EVENT CONTROLLER
 router.post('/add-events',verifyToken,eventController.AddEvents)
 router.post('/get-event',verifyToken,eventController.GetEvents)
