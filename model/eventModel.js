@@ -18,6 +18,14 @@ const eventSchema=new mongoose.Schema({
         type: Date,
         default: Date.now,
         required: true
+      },
+      time:{
+        type:String,
+        default:null
+      },
+      location:{
+        type:String,
+        default:null
       }
 });
 

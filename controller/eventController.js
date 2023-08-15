@@ -6,8 +6,8 @@ const jwt = require('jsonwebtoken');
 const AddEvents = async (req, res, next) => {
     try {
       const userId = req.userId;
-      const { message, club, } = req.body;
-      console.log(message, club, userId);
+      const { messages,club} = req.body;
+      console.log("----------",messages, userId);
       const clubdata = await clubCollection.findOne({ _id: club });
   
       if (!clubdata) {
@@ -22,7 +22,9 @@ const AddEvents = async (req, res, next) => {
   
       const event = new eventCollection({
         clubName: clubdata._id,
-        event: message,
+        event: messages.message,
+        location:messages.location,
+        time:messages.time,
         auther: eventAuthor,
       });
   
@@ -43,6 +45,8 @@ const AddEvents = async (req, res, next) => {
       console.log(eventdata);
       const modifiedEventData = eventdata.map(event => ({
         event:event.event,
+        location:event.location,
+        time:event.time,
         auther: event.auther,
         date: event.date,
         _id:event._id
