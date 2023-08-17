@@ -379,51 +379,6 @@ const GetClubProfile = async (req,res,next)=>{
   }
 }
 
-// const UpdateClub=async (req,res,next)=>{
-//   try {
-//     console.log("calleeeddd");
-//     const {category,registerNo,address,about,clubName,club}=req.body
-//     console.log("updationnnnnnnnn",category,registerNo,address,about,clubName,club );
-//     const clubExist = await clubCollection.findOne({clubName:club})
-//     console.log(clubExist)
-//     const clubnameFound = await clubCollection.findOne({ clubName:clubName });
-//     if (clubnameFound){
-//       if(club === clubnameFound.clubName &&
-//         clubExist.president.toString()===clubnameFound.president.toString() && 
-//         clubExist.secretory.toString()===clubnameFound.secretory.toString() &&
-//         clubExist.registerNo.toString()===clubnameFound.registerNo){
-
-//           await clubCollection.updateOne({_id:clubExist._id},{
-//            $set:{
-//             clubName:clubName,
-//             about: about,
-//             address: address,
-//             category: category,
-//             registerNo:registerNo,
-//            }
-//             })
-//       }else{
-//         return res.json({message:"Club name is not available"})
-//       }
-//     }else{
-//       await clubCollection.updateOne({_id:clubExist._id},{
-//         $set:{
-//          clubName:clubName,
-//          about: about,
-//          address: address,
-//          category: category,
-//          registerNo:registerNo,
-//         }
-//          })
-//     }
-//     const getclub=await clubCollection.findOne({_id:clubExist._id})
-//     console.log("--------------------------------------",getclub)
-//     res.json({getclub,message:"successfully updated"})
-//   } catch (error) {
-//     console.log("error occur in updation of club")
-//   }
-// }
-
 
 const UpdateClub = async (req, res, next) => {
   try {
@@ -539,7 +494,99 @@ const GetClubForm=async(req,res,next)=>{
   } catch (error) {
     console.log("error occur in get clubform data")
   }
+}
 
+const ChangeCommitte=async(req,res,next)=>{
+  try {
+    const {clubName,president,secretory,treasurer}=req.body
+    console.log(clubName,president,secretory,treasurer)
+    const userId=req.userId
+    console.log(userId);
+    const user=await userCollection.findOne({_id:userId})
+    let presidentExist = await userCollection.findOne({ email: president });
+    if (!presidentExist) {
+      return res.json({
+        errors: "There is no such person for being president"
+      });
+    }
+    let secretoryExist = await userCollection.findOne({ email: secretory });
+    if (!secretoryExist) {
+      return res.json({
+        errors: "There is no such person for being secretory"
+      });
+    }
+    let treasurerExist = await userCollection.findOne({ email: treasurer });
+    if (!treasurerExist) {
+      return res.json({
+        errors: "There is no such person for being treasurer"
+      });
+    }
+    let club = await clubCollection.findOne({clubName:clubName});
+    console.log(club);
+    let data = new Set();
+    data.add(club.president.toString())
+    data.add(club.secretory.toString())
+    data.add(club.treasurer.toString())
+    club.members.forEach((member)=>{
+      data.add(member.toString())
+    })  
+    if(!data.has(presidentExist._id.toString())||!data.has(secretoryExist._id.toString())||!data.has(treasurerExist._id.toString())){
+      res.json({errors: "Club admins can't be new joiners"})
+    }
+    if (!(presidentExist._id.toString() === club.president.toString() || secretoryExist._id.toString() === club.president.toString() || treasurerExist._id.toString() === club.president.toString())) {
+      await clubCollection.updateOne({ _id: club._id }, { $push: { members: club.president } });
+      await userCollection.updateOne(
+        { _id: club.president._id, 'clubs.club': club._id },
+        { $set: { 'clubs.$.role': 'member' } }
+      );
+    }
+    if (!(secretoryExist._id.toString() === club.secretory.toString() || secretoryExist._id.toString() === club.secretory.toString() || secretoryExist._id.toString() === club.secretory.toString())) {
+      await clubCollection.updateOne({ _id: club._id }, { $push: { members: club.secretory } });
+      await userCollection.updateOne(
+        { _id: club.secretory._id, 'clubs.club': club._id },
+        { $set: { 'clubs.$.role': 'member' } }
+      );
+    }
+    if (!(treasurerExist._id.toString() === club.treasurer.toString() || treasurerExist._id.toString() === club.treasurer.toString() || treasurerExist._id.toString() === club.treasurer.toString())) {
+      await clubCollection.updateOne({ _id: club._id }, { $push: { members: club.treasurer } });
+      await userCollection.updateOne(
+        { _id: club.treasurer._id, 'clubs.club': club._id },
+        { $set: { 'clubs.$.role': 'member' } }
+      );
+    }
+    
+    let update = await clubCollection.updateOne({ _id:club._id }, { $set: { president: presidentExist._id, secretory: secretoryExist._id, treasurer: treasurerExist._id } });
+     // Find the updated club details
+     let clubDetails = await clubCollection.findOne({ _id: club._id });
+
+     if (clubDetails.members.includes(presidentExist._id)) {
+      await clubCollection.updateOne({ _id: club._id }, { $pull: { members: presidentExist._id } });
+      await userCollection.updateOne(
+        { _id: presidentExist._id, 'clubs.club': club._id },
+        { $set: { 'clubs.$.role': 'president' } }
+      );
+    }
+    if (clubDetails.members.includes(secretoryExist._id)) {
+      await clubCollection.updateOne({ _id:club._id }, { $pull: { members: secretoryExist._id } });
+      await userCollection.updateOne(
+        { _id: secretoryExist._id, 'clubs.club': club._id },
+        { $set: { 'clubs.$.role': 'secretory' } }
+      );
+    }
+    if (clubDetails.members.includes(treasurerExist._id)) {
+      await clubCollection.updateOne({ _id:club._id }, { $pull: { members: treasurerExist._id } });
+      await userCollection.updateOne(
+        { _id: treasurerExist._id, 'clubs.club': club._id },
+        { $set: { 'clubs.$.role': 'treasurer' } }
+      );
+    }
+    sendEmail(presidentExist.email, `I-club Commitee Change",'Hello,\n\nSubject: Invitation to Join as President - ${clubDetails.clubName}\n\nI hope this email finds you in good spirits. On behalf of ${clubDetails.clubName},  warmest congratulations and invite you to join our club as the new President.\n\n\n\nBest regards,\n\n${user.username}\n${user.email}`)
+    sendEmail(secretoryExist.email, `I-club Commitee Change",'Hello,\n\nSubject: Invitation to Join as Secretory - ${clubDetails.clubName}\n\nI hope this email finds you in good spirits. On behalf of ${clubDetails.clubName},  warmest congratulations and invite you to join our club as the new Secretory.\n\n\n\nBest regards,\n\n${user.username}\n${user.email}`)
+    sendEmail(treasurerExist.email, `I-club Commitee Change",'Hello,\n\nSubject: Invitation to Join as Treasurer - ${clubDetails.clubName}\n\nI hope this email finds you in good spirits. On behalf of ${clubDetails.clubName},  warmest congratulations and invite you to join our club as the new TReasurer.\n\n\n\nBest regards,\n\n${user.username}\n${user.email}`)
+    res.json({update,message:`Successfully created ${club.clubName} new  committe`})
+  } catch (error) {
+    console.log("error occur in change commitee")
+  }
 }
 module.exports = { regclub,
                    joinClub,
@@ -552,7 +599,8 @@ module.exports = { regclub,
                    AddClubPost,
                    GetClubProfile,
                    UpdateClub,
-                   GetClubForm}
+                   GetClubForm,
+                   ChangeCommitte}
 
 
 
@@ -571,6 +619,51 @@ module.exports = { regclub,
 
 
 
+
+// const UpdateClub=async (req,res,next)=>{
+//   try {
+//     console.log("calleeeddd");
+//     const {category,registerNo,address,about,clubName,club}=req.body
+//     console.log("updationnnnnnnnn",category,registerNo,address,about,clubName,club );
+//     const clubExist = await clubCollection.findOne({clubName:club})
+//     console.log(clubExist)
+//     const clubnameFound = await clubCollection.findOne({ clubName:clubName });
+//     if (clubnameFound){
+//       if(club === clubnameFound.clubName &&
+//         clubExist.president.toString()===clubnameFound.president.toString() && 
+//         clubExist.secretory.toString()===clubnameFound.secretory.toString() &&
+//         clubExist.registerNo.toString()===clubnameFound.registerNo){
+
+//           await clubCollection.updateOne({_id:clubExist._id},{
+//            $set:{
+//             clubName:clubName,
+//             about: about,
+//             address: address,
+//             category: category,
+//             registerNo:registerNo,
+//            }
+//             })
+//       }else{
+//         return res.json({message:"Club name is not available"})
+//       }
+//     }else{
+//       await clubCollection.updateOne({_id:clubExist._id},{
+//         $set:{
+//          clubName:clubName,
+//          about: about,
+//          address: address,
+//          category: category,
+//          registerNo:registerNo,
+//         }
+//          })
+//     }
+//     const getclub=await clubCollection.findOne({_id:clubExist._id})
+//     console.log("--------------------------------------",getclub)
+//     res.json({getclub,message:"successfully updated"})
+//   } catch (error) {
+//     console.log("error occur in updation of club")
+//   }
+// }
 
 
 

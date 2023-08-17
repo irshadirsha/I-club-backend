@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt =require('bcrypt')
 const nodemailer = require("nodemailer");
 require('dotenv').config();
+// const { ObjectId } = require('mongodb');
 // const cloudinary = require('cloudinary').v2;
 
 const  ImageUpdate=async(req,res,next)=>{
@@ -247,18 +248,45 @@ const updateProfile=async(req,res,next)=>{
   }
 }
 
-const GetProfile=async(req,res,next)=>{
-    
-    try {
-      const userId = req.userId;
-    console.log("USERIDDDDDDDDDDDDD",userId);
-      const userdata=await userCollection.findOne({_id:userId})
-      res.json({userdata})
-    } catch (error) {
-      console.log("error occur")
-    }
-}
 
+const GetProfile = async (req, res, next) => {
+  try {
+    const userId = req.userId;
+
+    const userdata = await userCollection.findOne({ _id: userId }).populate('clubs.club')
+      // .populate({
+      //   path: 'clubs.club',   // Use dot notation to access the club field within clubs array
+      //   model: 'clubdata',    // Specify the model to populate from
+      //   select: '-members'    // Exclude the members field from clubdata
+      // })
+      // .exec();
+
+    console.log("get profile-------", userdata);
+    res.json({ userdata });
+  } catch (error) {
+    console.log("Error occurred:", error);
+    res.status(500).json({ message: "An error occurred" });
+  }
+};
+
+
+
+// const GetProfile=async(req,res,next)=>{
+    
+//     try {
+//       const userId = req.userId;
+//     console.log("USERIDDDDDDDDDDDDD",userId);
+//       const userdata=await userCollection.findOne({_id:userId}).populate('club')
+//       console.log("get profile-------",userdata);
+//           const clubss=userdata.clubs.map(club=>club.club)
+//          console.log(clubss);
+//        const clubdata=await clubCollection.find() 
+//       console.log(clubdata);
+//       res.json({userdata})
+//     } catch (error) {
+//       console.log("error occur")
+//     }
+// }
 
 
 const googleoAuth =async (req,res,next)=>{
@@ -269,7 +297,16 @@ const googleoAuth =async (req,res,next)=>{
 
 
 
-module.exports={ImageUpdate,userHome,userSignup,userLogin,googleoAuth,SendEmail,ResetPassword,SetNewPass,updateProfile,GetProfile}
+module.exports={ImageUpdate,
+                userHome,
+                userSignup,
+                userLogin,
+                googleoAuth,
+                SendEmail,
+                ResetPassword,
+                SetNewPass,
+                updateProfile,
+                GetProfile}
 
 
 

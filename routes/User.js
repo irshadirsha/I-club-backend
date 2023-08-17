@@ -41,6 +41,7 @@ router.get('/get-clubprofile',verifyToken,clubController.GetClubProfile)
 // UPDATE IN CLUB DATA
 router.post('/update-club',verifyToken,clubController.UpdateClub)
 router.get('/get-clubform',verifyToken,clubController.GetClubForm)
+router.post('/change-committe',verifyToken,clubController.ChangeCommitte)
 //EVENT CONTROLLER
 router.post('/add-events',verifyToken,eventController.AddEvents)
 router.post('/get-event',verifyToken,eventController.GetEvents)
