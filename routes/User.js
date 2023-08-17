@@ -19,7 +19,7 @@ router.post('/new-password',userController.SetNewPass)
 router.post('/googleAuth',userController.googleoAuth)
 router.post('/user-profileupdate',verifyToken,userController.updateProfile)
 router.post('/getuser-profile',verifyToken,userController.GetProfile)
- router.post('/user-profileimgupdate',verifyToken,userController.ImageUpdate)
+router.post('/user-profileimgupdate',verifyToken,userController.ImageUpdate)
 
 // CLUB CONTROLLER
 
@@ -37,6 +37,10 @@ router.post('/delete-member',verifyToken,clubController.DeleteMember)
 router.post('/add-clubprofile',verifyToken,clubController.AddClubProfile)
 router.post('/add-clubpost',verifyToken,clubController.AddClubPost)
 router.get('/get-clubprofile',verifyToken,clubController.GetClubProfile)
+
+// UPDATE IN CLUB DATA
+router.post('/update-club',verifyToken,clubController.UpdateClub)
+router.get('/get-clubform',verifyToken,clubController.GetClubForm)
 //EVENT CONTROLLER
 router.post('/add-events',verifyToken,eventController.AddEvents)
 router.post('/get-event',verifyToken,eventController.GetEvents)
