@@ -51,6 +51,12 @@ const clubSchema=new mongoose.Schema({
         type:String,
         default:null
       },
+      newmember: [
+        {
+          type: String,
+          default:null
+        }
+      ],
       members: [
         {
           type: mongoose.Schema.Types.ObjectId,

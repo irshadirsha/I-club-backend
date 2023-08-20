@@ -30,7 +30,7 @@ const AddEvents = async (req, res, next) => {
   
       const added = await event.save();
       console.log("added successfully");
-      return res.json({ added,status: "event added successfully" })
+      return res.json({ added,message: "event added successfully" })
     } catch (error) {
       res.status(500).json({ error: "An error occurred" });
     }
@@ -63,12 +63,10 @@ const AddEvents = async (req, res, next) => {
         const {id}=req.body
     console.log("deleteeeeee",id) 
     let deleted = await eventCollection.deleteOne({ _id:id })
-    res.json({deleted,status:"deleted successfully"});
+    res.json({deleted,message:"deleted successfully"});
     } catch (error) {
         console.log("error occur")
     }
-   
-
   }
   
 module.exports={AddEvents,GetEvents,DeleteEvent}

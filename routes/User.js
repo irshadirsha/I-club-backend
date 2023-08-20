@@ -26,6 +26,9 @@ router.post('/user-profileimgupdate',verifyToken,userController.ImageUpdate)
 router.post('/createclub',verifyToken,clubController.regclub)
 router.post('/joinclub',verifyToken,clubController.joinClub)
 router.post('/clubhome',verifyToken,clubController.ClubHome)
+router.get('/serch-clubs',verifyToken,clubController.SearchClubs)
+router.post('/make-request',verifyToken,clubController.MakeRequest)
+router.get('/fetch-reqcount',verifyToken,clubController.FetchCount)
 
 //CLUB AUTHORITY AND ADD MEMMBERS
 router.get('/get-authority',verifyToken,clubController.GetClubAuthority)

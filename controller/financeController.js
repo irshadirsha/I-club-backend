@@ -55,7 +55,7 @@ const AddExpense = async (req, res, next) => {
             });
 
             const added = await finance.save();
-            res.json({ added, status: "added successfully" });
+            res.json({ added, message: "added successfully" });
         } else {
             res.status(400).json({ error: "Club not found" });
         }

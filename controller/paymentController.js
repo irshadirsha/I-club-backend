@@ -21,7 +21,7 @@ const MakePayment = async (req, res, next) => {
   
       const added = await finance.save();
       console.log("added successfully", added);
-      res.json({ added });
+      res.json({ added ,message:"payment successfull"});
     } catch (error) {
       console.error("Error adding payment:", error);
       res.status(500).json({ error: "An error occurred while processing the payment." });

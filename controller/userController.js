@@ -252,7 +252,6 @@ const updateProfile=async(req,res,next)=>{
 const GetProfile = async (req, res, next) => {
   try {
     const userId = req.userId;
-
     const userdata = await userCollection.findOne({ _id: userId }).populate('clubs.club')
       // .populate({
       //   path: 'clubs.club',   // Use dot notation to access the club field within clubs array
@@ -260,7 +259,6 @@ const GetProfile = async (req, res, next) => {
       //   select: '-members'    // Exclude the members field from clubdata
       // })
       // .exec();
-
     console.log("get profile-------", userdata);
     res.json({ userdata });
   } catch (error) {

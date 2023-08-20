@@ -215,7 +215,7 @@ const AddMember=async(req,res,next)=>{
   try {
     const { clubName, adduser } = req.body;
     const userId=req.userId;
-    console.log("ADDMEMMBERRR",clubName,userId,adduser);
+    console.log("ADDMEMMBERRRrrrrrrrrr",clubName,userId,adduser);
     const club=await clubCollection.findOne({clubName:clubName})
     console.log(club)
     let head = await userCollection.findOne({ _id: userId });
@@ -241,8 +241,11 @@ const AddMember=async(req,res,next)=>{
     } else{
       await clubCollection.updateOne(
         { _id:club._id},
-        { $addToSet: { members: user._id } }
-      );
+        { 
+          $addToSet: { members: user._id },
+          $pull: { newmember: user.email },
+         }
+      );    
       sendEmail(
       user.email,
       `I-club Invitation`,
@@ -263,9 +266,9 @@ const AddMember=async(req,res,next)=>{
      }]}}});
     }
 
-
     console.log("Inserted into user's clubs array");
-    }
+  }
+  
     let gettingMember = await clubCollection.findById(club._id)
           .populate('members')
       res.json({message:`Succesfully added ${memb} to club`,data:gettingMember})
@@ -372,7 +375,7 @@ const GetClubProfile = async (req,res,next)=>{
       }
       const postdata=await postCollection.find({clubName:clubExist._id})
       console.log(postdata)
-      // const memberCount = clubExist.members.length;
+
       res.json({clubExist,userRole,postdata})   
   } catch (error) {
     console.log("error occr in get profiledata")
@@ -588,6 +591,69 @@ const ChangeCommitte=async(req,res,next)=>{
     console.log("error occur in change commitee")
   }
 }
+
+const SearchClubs = async (req, res, next) => {
+  try {
+    const userId = req.userId; // Assuming you have userId available
+    const user = await userCollection.findOne({ _id: userId });
+
+    const { q } = req.query;
+    console.log("query -----", q);
+    const regex = new RegExp(q, 'i');
+    
+    // Find clubs that match the search query
+    const clubs = await clubCollection.find({ clubName: regex });
+
+    const clubsWithUserRole = clubs.map(club => {
+      const userClub = user.clubs.find(userClub => userClub.club.toString() === club._id.toString());
+      if (userClub) {
+        return { ...club._doc, userRole: userClub.role };
+      } else {
+        return club._doc;
+      }
+    });
+
+    res.json(clubsWithUserRole);
+  } catch (error) {
+    console.log("error in search:", error);
+    res.status(500).json({ error: "An error occurred" });
+  }
+};
+
+const MakeRequest = async (req,res,next)=>{
+  try {
+    const userId=req.userId
+    const {clubId}=req.body
+    console.log("///////////",userId,clubId);
+    const user=await userCollection.findOne({_id:userId})
+    const email=user.email
+    await clubCollection.updateOne(
+      { _id: clubId },
+      { $addToSet: { newmember: email } }
+    );
+    return res.json({message:"request done"})
+  } catch (error) {
+    console.log("error occur in request making to join club");
+  }
+
+}
+
+const FetchCount = async (req, res, next) => {
+  const { clubName } = req.query;
+  console.log("777777777777777777", clubName);
+  try {
+    const club = await clubCollection.findOne({ clubName: clubName });
+    if (!club) {
+      return res.json({ error: "Club not found" });
+    }
+    const newMemberCount = club.newmember.length;
+    res.json({ newMemberCount });
+  } catch (error) {
+    console.error("Error fetching count:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
 module.exports = { regclub,
                    joinClub,
                    ClubHome,
@@ -600,7 +666,10 @@ module.exports = { regclub,
                    GetClubProfile,
                    UpdateClub,
                    GetClubForm,
-                   ChangeCommitte}
+                   ChangeCommitte,
+                   SearchClubs,
+                   MakeRequest,
+                   FetchCount}
 
 
 
@@ -610,6 +679,25 @@ module.exports = { regclub,
 
 
 
+// const SearchClubs=async (req,res,next)=>{
+//   try {
+//     const userId=req.userId
+//     const user=await userCollection.findOne({_id:userId})
+//     const { q } = req.query; 
+//     console.log("query -----",q);
+//     const regex = new RegExp(q, 'i'); 
+//     const clubs = await clubCollection.find({ clubName: regex }); 
+//     res.json(clubs);
+    
+//     const userRole = user.clubs.find(club => club.club.toString() === clubExist._id.toString())?.role;
+//     if (!userRole) {
+//         return res.json({ error: "User role not found for the club" });
+//     }
+
+//   } catch (error) {
+//     console.log("error in search");
+//   }
+// }
 
 
 
