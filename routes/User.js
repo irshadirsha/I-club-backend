@@ -7,6 +7,7 @@ const eventController =require ('../controller/eventController')
 const finaceController =require ('../controller/financeController')
 const paymentController = require('../controller/paymentController')
 const notificationController =require ('../controller/NotificationController')
+const chatController =require ('../controller/chatController')
 const verifyToken = require('../middleware/auth')
 router.get('/',userController.userHome)
 
@@ -62,6 +63,9 @@ router.post('/send-note',verifyToken,notificationController.SendNote)
 router.get('/get-note',verifyToken,notificationController.GetNote)
 router.post('/delete-note',verifyToken,notificationController.DeleteNote)
 
+// CHAT MESSAGES CONTROLLER
+router.post('/send-message',verifyToken,chatController.SendMessage)
+router.get('/get-message',verifyToken,chatController.GetChat)
 
 module.exports = router;
 

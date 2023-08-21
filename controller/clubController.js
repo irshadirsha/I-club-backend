@@ -5,6 +5,7 @@ const nodemailer = require("nodemailer");
 const sendEmail = require('../sendEmail/emailSend')
 const { BulkWriteOperation } = require('mongodb');
 const postCollection = require('../model/clubPostModel')
+const chatCollection = require('../model/chatModel');
 const bcrypt = require('bcrypt');
 
 const regclub = async (req, res, next) => {
@@ -183,8 +184,13 @@ const ClubHome = async (req, res, next) => {
      .populate('president').populate('secretory').populate('treasurer')
      let clubdatas=getclubdata
      let user=userdata._id
+     const userRole = userdata.clubs.find(club => club.club.toString() === getclubdata._id.toString())?.role;
+     if (!userRole) {
+         return res.json({ error: "User role not found for the club" });
+     }
+    
      console.log(userdata)
-     res.json({data:clubdatas,user:user})
+     res.json({data:clubdatas,user:user,userRole:userRole})
   } catch (error) {
     next(error);
   }
