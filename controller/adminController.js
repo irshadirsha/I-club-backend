@@ -2,6 +2,7 @@
 const adminCollection = require('../model/adminModel');
 const userCollection = require('../model/userModel')
 const clubCollection  =require('../model/clubModel')
+const postCollection = require('../model/clubPostModel')
 const jwt = require('jsonwebtoken')
 
 
@@ -102,6 +103,7 @@ const SetBlacklist = async (req,res,next)=>{
   try {
      const {id}=req.body
      console.log(id) 
+     console.log('qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq') 
      await clubCollection.updateOne({_id:id},{$set:{isblacklisted:true
      }})
      const clubs=await clubCollection.find({})
@@ -118,7 +120,9 @@ const ViewClubData = async (req,res,next)=>{
     const clubdetails= await clubCollection.findOne({_id:id})
     .populate('president').populate('secretory').populate('treasurer').populate('members')  
     console.log(clubdetails);
-    res.json({data:clubdetails})
+    const post=await postCollection.find({clubName:clubdetails._id})
+    console.log("pppppppppp",post);
+    res.json({data:clubdetails,post})
   } catch (error) {
    console.log("error occured") 
   }

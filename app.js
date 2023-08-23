@@ -4,7 +4,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const cors =require ('cors')
-
+const http = require ('http');
 require('dotenv').config();
 
 // const bodyParser = require('body-parser');
@@ -15,7 +15,7 @@ var app = express();
 
 
 app.use(cors({
-  origin: ["http://localhost:5173"],
+  origin: process.env.Client_Side_URL ,
   methods: ["GET", "POST"],
   credentials: true
 }))
@@ -35,10 +35,34 @@ app.use('/admin', adminRouter);
 
 const connect = require('./config/connection');
 connect();
-// catch 404 and forward to error handler
-// app.use(function(req, res, next) {
-//   next(createError(404));
-// });
+
+
+const httpServer = http.createServer(app);
+const { Server } = require('socket.io');
+const io = new Server(httpServer, {
+  cors: {
+    origin: process.env.Client_Side_URL,
+    methods: ['GET', 'POST'],
+  },
+});
+
+const port = process.env.PORT;
+httpServer.listen(port, () => {
+  console.log(`Server started on port ${port}`);
+});
+
+io.on('connection', (socket) => {
+  console.log(' user connected', socket.id);
+  socket.on('chatMessage', (chatMessage) => {
+    console.log('chatMessage:', chatMessage);
+    io.emit('chatMessage', chatMessage);
+  });
+
+  socket.on('disconnect', () => {
+    console.log('user disconnected', socket.id);
+  });
+});
+
 
 // error handler
 app.use(function(err, req, res, next) {
@@ -51,8 +75,8 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-app.listen(4000,()=>{
-  console.log("server started port 4000")
-})
+// app.listen(process.env.PORT,()=>{
+//   console.log("server started port 4000")
+// })
 
 module.exports = app;

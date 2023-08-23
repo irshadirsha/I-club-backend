@@ -102,11 +102,15 @@ const userLogin = async (req, res, next) => {
       return res.json({ errors, created: false });
     }
     if (!passwordRegex.test(password)) {
-      const errors = { password: 'Enter a valid password' };
+      const errors = { password: 'Enter Uppercase with special char'};
       return res.json({ errors, created: false });
     } else {
       const user = await userCollection.findOne({ email: email });
       if (user) {
+        if(user.isBlock==true){
+          const errors = { Block: 'You are blocked by Admin'};
+          return res.json({ errors, created: false });
+        }
         console.log("nowwwwww",user);
         if (await bcrypt.compare(password, user.password)) {
           console.log("logged successfully");
