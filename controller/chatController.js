@@ -42,5 +42,25 @@ const GetChat= async (req,res,next)=>{
         console.log("error occur in get chat");
     }
 }
+
+const GetMeetingData=async (req,res,next)=>{
+    try {
+        const{clubName}=req.query
+        const userId=req.userId
+        console.log("videooooooo",userId,clubName);
+        const club= await clubCollection.findOne({clubName:clubName})
+        const user=await userCollection.findOne({_id:userId})
+        const userRole = user.clubs.find(clubItem => clubItem.club.toString() === club._id.toString())?.role;
+    if (!userRole) {
+        return res.json({ error: "User role not found for the club" });
+    }
+    console.log(userRole);
+    return res.json({data:userRole});
+    } catch (error) {
+        console.log("errror in meeting get api");
+    }
+
+}
 module.exports = { SendMessage,
-                   GetChat}
+                   GetChat,
+                   GetMeetingData}

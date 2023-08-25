@@ -4,7 +4,7 @@ const userCollection = require('../model/userModel')
 const clubCollection  =require('../model/clubModel')
 const postCollection = require('../model/clubPostModel')
 const jwt = require('jsonwebtoken')
-
+require('dotenv').config();
 
 const adminsingin = async (req, res) => {
   
@@ -12,12 +12,14 @@ const adminsingin = async (req, res) => {
     let {username,password}=req.body
     console.log(username)
     console.log(password)
-    let admin=await adminCollection.findOne({username})
+    let admin=await adminCollection.findOne({username:username})
     if(admin){
         if(admin.password===password){
             console.log("succefully logged")
-            const token=jwt.sign({sub:admin._id},'Key',{expiresIn:'3d'})
-            res.json({token,admin:true})
+            const token=jwt.sign({sub:admin._id},process.env.jwtSecretKey,{expiresIn:'3d'})
+            console.log(token,"---------------------------");
+            return res.json({admin:admin,token,created:true})
+
         }else{
             console.log("username not exist");
             const errors={password:"password wrong"}

@@ -7,8 +7,8 @@ const verifyToken =async  (req, res, next) => {
   if(!req.headers.authorization){
     return 
   }
-  const token = req.headers.authorization.split(" ")[1];
-
+  
+const token = req.headers.authorization.split(" ")[1];
   // const token=token1.toString()
   console.log(token, '----------------------token');
   if (!token) {

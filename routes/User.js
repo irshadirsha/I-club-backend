@@ -67,6 +67,9 @@ router.post('/delete-note',verifyToken,notificationController.DeleteNote)
 router.post('/send-message',verifyToken,chatController.SendMessage)
 router.get('/get-message',verifyToken,chatController.GetChat)
 
+// VIDEOCALL CONTROLLER
+router.get('/get-meetingdata',verifyToken,chatController.GetMeetingData)
+
 module.exports = router;
 
 

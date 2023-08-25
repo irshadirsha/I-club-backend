@@ -30,7 +30,7 @@ const userSignup = async (req,res,next)=>{
       const existemail=await userCollection.findOne({email:email})
       console.log("Google",existemail);
        if(existemail){
-        console.log("",--existemail);
+        console.log("",existemail);
         const token = jwt.sign({ sub: existemail._id }, process.env.jwtSecretKey, { expiresIn: '3d' });
         console.log(token,"---------------------------");
         res.json({ user:existemail,token, created: true });
