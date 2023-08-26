@@ -13,6 +13,8 @@ router.post('/unblock-user',adminVerify,adminController.UnBlockUser)
 
 router.post('/get-clubdata',adminVerify,adminController.GetClubdata)
 router.post('/set-blacklist',adminVerify,adminController.SetBlacklist)
+router.get('/get-blacklisted',adminVerify,adminController.GetBlacklisted)
+router.post('/removeblacklist',adminVerify,adminController.RemoveFromBlacklist)
 router.get('/club-details',adminVerify,adminController.ViewClubData)
 module.exports = router;
 

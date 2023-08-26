@@ -388,6 +388,20 @@ const GetClubProfile = async (req,res,next)=>{
   }
 }
 
+const DeletePost = async (req, res, next) => {
+  try {
+    const { postId } = req.body;
+    const result = await postCollection.deleteOne({ _id: postId });
+    if (result.deletedCount === 1) {
+      res.status(200).json({ message: "Post deleted successfully" });
+    } else {
+      res.status(404).json({ message: "Post not found" });
+    }
+  } catch (error) {
+    console.error("Error deleting post:", error);
+    res.status(500).json({ message: "An error occurred while deleting the post" });
+  }
+};
 
 const UpdateClub = async (req, res, next) => {
   try {
@@ -675,7 +689,8 @@ module.exports = { regclub,
                    ChangeCommitte,
                    SearchClubs,
                    MakeRequest,
-                   FetchCount}
+                   FetchCount,
+                   DeletePost}
 
 
 

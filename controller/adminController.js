@@ -37,6 +37,7 @@ const adminsingin = async (req, res) => {
 
 
 const adminDashboard=async (req,res,next)=>{
+  
   console.log("dsashbord")
 }
 
@@ -114,6 +115,30 @@ const SetBlacklist = async (req,res,next)=>{
     console.log("error occur")
   }
 }
+const GetBlacklisted = async (req, res, next) => {
+  try {
+    const clubs = await clubCollection.find({ isblacklisted: true });
+    res.json({club:clubs});
+  } catch (error) {
+    console.error('Error fetching blacklisted clubs:', error);
+    res.status(500).json({ error: 'Error fetching blacklisted clubs' });
+  }
+};
+
+const RemoveFromBlacklist = async (req, res, next) => {
+  try {
+    const { id } = req.body;
+    await clubCollection.findOneAndUpdate(
+      { _id: id },
+      { $set: { isblacklisted: false } }
+    );
+    res.json({ message: 'Club removed from blacklist' });
+  } catch (error) {
+    console.error('Error removing club from blacklist:', error);
+    res.status(500).json({ error: 'Error removing club from blacklist' });
+  }
+};
+
 
 const ViewClubData = async (req,res,next)=>{
   try {
@@ -138,7 +163,9 @@ module.exports = { adminsingin,
                    UnBlockUser,
                    GetClubdata,
                    SetBlacklist,
-                   ViewClubData};
+                   ViewClubData,
+                   GetBlacklisted,
+                   RemoveFromBlacklist};
 
 
 
