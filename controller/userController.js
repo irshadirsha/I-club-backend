@@ -69,7 +69,7 @@ const userSignup = async (req,res,next)=>{
         return res.json({ errors, created: false });
       }
       if (!passwordRegex.test(password)) {
-        const errors = { password: 'Enter a valid password' };
+        const errors = { password: 'Enter 1 capital,1 special char,1 digit minimum 8 letter ' };
         return res.json({ errors, created: false });
       }else{     
       
@@ -271,24 +271,6 @@ const GetProfile = async (req, res, next) => {
   }
 };
 
-
-
-// const GetProfile=async(req,res,next)=>{
-    
-//     try {
-//       const userId = req.userId;
-//     console.log("USERIDDDDDDDDDDDDD",userId);
-//       const userdata=await userCollection.findOne({_id:userId}).populate('club')
-//       console.log("get profile-------",userdata);
-//           const clubss=userdata.clubs.map(club=>club.club)
-//          console.log(clubss);
-//        const clubdata=await clubCollection.find() 
-//       console.log(clubdata);
-//       res.json({userdata})
-//     } catch (error) {
-//       console.log("error occur")
-//     }
-// }
 
 
 const googleoAuth =async (req,res,next)=>{

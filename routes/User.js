@@ -21,6 +21,7 @@ router.post('/googleAuth',userController.googleoAuth)
 router.post('/user-profileupdate',verifyToken,userController.updateProfile)
 router.post('/getuser-profile',verifyToken,userController.GetProfile)
 router.post('/user-profileimgupdate',verifyToken,userController.ImageUpdate)
+router.post('/leave-club',verifyToken,clubController.LeaveClub)
 
 // CLUB CONTROLLER
 

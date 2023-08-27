@@ -674,6 +674,26 @@ const FetchCount = async (req, res, next) => {
   }
 };
 
+
+const LeaveClub=async(req,res,next)=>{
+  try {
+    const {clubName}=req.body
+    const userId=req.userId
+    console.log("leave",clubName,userId);
+    const club=await clubCollection.findOne({clubName:clubName})
+    await userCollection.updateOne(
+      { _id: userId },
+      { $pull: { clubs: { club: club._id } } }
+    );
+    await clubCollection.updateOne({_id:club._id},
+      {$pull:{members:userId}})
+    console.log("removed from both club and user collection ");
+    res.json({message:`You left from ${clubName}`})
+  } catch (error) {
+    
+  }
+
+}
 module.exports = { regclub,
                    joinClub,
                    ClubHome,
@@ -690,7 +710,8 @@ module.exports = { regclub,
                    SearchClubs,
                    MakeRequest,
                    FetchCount,
-                   DeletePost}
+                   DeletePost,
+                   LeaveClub}
 
 
 

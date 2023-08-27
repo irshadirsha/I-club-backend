@@ -22,12 +22,12 @@ const adminsingin = async (req, res) => {
 
         }else{
             console.log("username not exist");
-            const errors={password:"password wrong"}
+            const errors={password:"Please Enter correct password"}
             res.json({errors,admin:false})
         }
     }else{
         console.log("username not exist");
-        const errors={username:"username not exist"}
+        const errors={username:"Please Enter correct Username"}
         res.json({errors,admin:false})
     }
   } catch (error) {
@@ -36,10 +36,24 @@ const adminsingin = async (req, res) => {
 };
 
 
-const adminDashboard=async (req,res,next)=>{
-  
-  console.log("dsashbord")
-}
+const adminDashboard = async (req, res, next) => {
+  try {
+    const blockedUserCount = await userCollection.countDocuments({ isBlock: true });
+    const activeUserCount = await userCollection.countDocuments();
+    const blacklisted = await clubCollection.countDocuments({isblacklisted:true});
+    const clubs = await clubCollection.countDocuments();
+    
+    console.log("Blocked User Count:", blockedUserCount);
+    console.log("Active User Count:", activeUserCount);
+    console.log("Blocked club Count:", clubs);
+    console.log("Active club Count:", blacklisted);
+   res.json({blockedUserCount,activeUserCount,clubs,blacklisted})
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).send("An error occurred");
+  }
+};
+
 
 const UserManage = async (req, res, next) => {
   try {
@@ -65,9 +79,9 @@ const BlockUser = async (req, res, next) => {
     if (checkuser) {
       console.log(checkuser);
       await userCollection.findOneAndUpdate({ _id: blockid }, { $set: { isBlock: true } });
-      res.json({ status: true, result: "user blocked" });
+      res.json({ status: true, message: "Successfully Blocked the User" });
     } else {
-      res.json({ status: false, result: "user not found" });
+      res.json({ status: false, message: "User not found" });
     }
   } catch (error) {
     console.error(error);
@@ -84,9 +98,9 @@ const UnBlockUser=async(req,res,next)=>{
     if (checkuser) {
       console.log(checkuser);
       await userCollection.findOneAndUpdate({ _id: Unblockid }, { $set: { isBlock: false } });
-      res.json({ status: true, result: "user Unblocked" });
+      res.json({ status: true, message: "Successfully UnBlocked the User" });
     } else {
-      res.json({ status: false, result: "user not found" });
+      res.json({ status: false, message: "User not found" });
     }
   } catch (error) {
     
@@ -110,7 +124,7 @@ const SetBlacklist = async (req,res,next)=>{
      await clubCollection.updateOne({_id:id},{$set:{isblacklisted:true
      }})
      const clubs=await clubCollection.find({})
-     res.json({clubs,status:"blacklistedsuccessfully"})
+     res.json({clubs,message:"blacklisted successfully"})
   } catch (error) {
     console.log("error occur")
   }
