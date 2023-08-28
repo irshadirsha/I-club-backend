@@ -3,6 +3,7 @@ const adminCollection = require('../model/adminModel');
 const userCollection = require('../model/userModel')
 const clubCollection  =require('../model/clubModel')
 const postCollection = require('../model/clubPostModel')
+const bannerCollection = require('../model/bannerModel')
 const jwt = require('jsonwebtoken')
 require('dotenv').config();
 
@@ -169,6 +170,41 @@ const ViewClubData = async (req,res,next)=>{
   }
 }
 
+const AddBanner = async (req,res,next)=>{
+  try {
+    const{description,bannerimageUrl}=req.body
+    console.log(description,bannerimageUrl);
+    const  banner = new bannerCollection({
+      bannerimage:bannerimageUrl,
+      about:description
+    })
+    await banner.save()
+    res.json({message:"Banner added succesfullly"})
+  } catch (error) {
+    console.log("error in adding banner ");
+  }
+}
+
+const GetBanner = async (req,res,next)=>{
+  try {
+    const banner= await bannerCollection.find()
+    console.log(banner);
+    res.json({banner})
+  } catch (error) {
+    
+  }
+}
+
+const DeleteBanner = async (req,res,next)=>{
+  try {
+    const {deleteId}=req.body
+    console.log(deleteId);
+    await bannerCollection.deleteOne({_id:deleteId})
+    res.json({message:"Banner Successfully deleted"})
+  } catch (error) {
+    
+  }
+}
 
 module.exports = { adminsingin,
                    adminDashboard,
@@ -179,7 +215,10 @@ module.exports = { adminsingin,
                    SetBlacklist,
                    ViewClubData,
                    GetBlacklisted,
-                   RemoveFromBlacklist};
+                   RemoveFromBlacklist,
+                   AddBanner,
+                   GetBanner,
+                   DeleteBanner};
 
 
 

@@ -4,12 +4,13 @@ require('dotenv').config();
 const adminVerify = async (req, res, next) => {
     console.log("TOKEN",req.headers.authorization);
     console.log("SECRET", process.env.jwtSecretKey);
+  
+    
     const token = req.headers.authorization.split(" ")[1];
-   console.log("admin Token",token);
     if (!token) {
         return res.status(401).json({ message: 'Token not provided' });
     }
-
+    console.log("admin Token",token);
     try {
         const decodedToken = jwt.verify(token, process.env.jwtSecretKey);
         req.adminId = decodedToken.sub; // Assuming your token payload has a 'sub' field representing admin ID

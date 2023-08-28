@@ -13,6 +13,9 @@ router.post('/set-blacklist',adminVerify,adminController.SetBlacklist)
 router.get('/get-blacklisted',adminVerify,adminController.GetBlacklisted)
 router.post('/removeblacklist',adminVerify,adminController.RemoveFromBlacklist)
 router.get('/club-details',adminVerify,adminController.ViewClubData)
+router.post('/add-banner',adminVerify,adminController.AddBanner)
+router.get('/get-bannerdata',adminVerify,adminController.GetBanner)
+router.post('/delete-banner',adminVerify,adminController.DeleteBanner)
 module.exports = router;
 
 

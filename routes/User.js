@@ -8,6 +8,7 @@ const finaceController =require ('../controller/financeController')
 const paymentController = require('../controller/paymentController')
 const notificationController =require ('../controller/NotificationController')
 const chatController =require ('../controller/chatController')
+const bannerController = require('../controller/bannerController')
 const verifyToken = require('../middleware/auth')
 router.get('/',userController.userHome)
 
@@ -22,6 +23,7 @@ router.post('/user-profileupdate',verifyToken,userController.updateProfile)
 router.post('/getuser-profile',verifyToken,userController.GetProfile)
 router.post('/user-profileimgupdate',verifyToken,userController.ImageUpdate)
 router.post('/leave-club',verifyToken,clubController.LeaveClub)
+router.get('/get-bannerhome',verifyToken,bannerController.GetBannerHome)
 
 // CLUB CONTROLLER
 
