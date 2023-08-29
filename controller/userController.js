@@ -21,7 +21,6 @@ const userHome = (req,res)=>{
 const userSignup = async (req,res,next)=>{
    try {
     console.log("signup------------");
-   
     const isGoogleSignup = req.body.isGoogleSignup;
     // google signup
     if (isGoogleSignup) {
@@ -53,35 +52,13 @@ const userSignup = async (req,res,next)=>{
         const errors={email:"email is already exists"}
         return res.json({errors,created:false})
     }
-    console.log(username,email,password);
-     
-    const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
-    const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-
-    if (!usernameRegex.test(username)) {
-        const errors = { username: 'Enter a valid username' };
-        return res.json({ errors, created: false });
-      }
-      if (!emailRegex.test(email)) {
-        const errors = { email: 'Enter a valid email' };
-        return res.json({ errors, created: false });
-      }
-      if (!passwordRegex.test(password)) {
-        const errors = { password: 'Enter 1 capital,1 special char,1 digit minimum 8 letter ' };
-        return res.json({ errors, created: false });
-      }else{     
-      
+    console.log(username,email,password);    
         const hashedPassword = await bcrypt.hash(password, 10);
       const data= await userCollection.create({username,email,password:hashedPassword})
        const token = jwt.sign({ sub: data._id }, process.env.jwtSecretKey, { expiresIn: '3d' });
        res.json({data,token,created:true})
       console.log(token);
       }  
-    
-    }
-    
    } catch (error) {
     res.json({ error, created: false });
    }
@@ -95,20 +72,10 @@ const userLogin = async (req, res, next) => {
     console.log(email);
     console.log(password);
 
-    const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      const errors = { email: 'Enter a valid email' };
-      return res.json({ errors, created: false });
-    }
-    if (!passwordRegex.test(password)) {
-      const errors = { password: 'Enter Uppercase with special char'};
-      return res.json({ errors, created: false });
-    } else {
       const user = await userCollection.findOne({ email: email });
       if (user) {
         if(user.isBlock==true){
-          const errors = { Block: 'You are blocked by Admin'};
+          const errors = { email: 'You are blocked by Admin'};
           return res.json({ errors, created: false });
         }
         console.log("nowwwwww",user);
@@ -118,15 +85,14 @@ const userLogin = async (req, res, next) => {
           res.json({userData: user,token, user: true});
         } else {
           console.log("password wrong");
-          const errors = { password: "Password wrong" };
+          const errors = { password: "Password is wrong.." };
           res.json({ errors, user: false });
         }
       } else {
         console.log("email not exist");
-        const errors = { email: "Email does not exist" };
+        const errors = { email: "Email does not exist.." };
         res.json({ errors, user: false });
-      }
-    }
+      } 
   } catch (error) {
     console.log("error:", error.message);
     res.json({ error: "An error occurred" });
@@ -294,190 +260,10 @@ module.exports={ImageUpdate,
 
 
 
-// LINK IN OTP
 
-// const SendEmail=async (req,res,next)=>{
-//   try {
-//     const {email}=req.body
-//   console.log("otppppp",email);
-//   const oldUser=await userCollection.findOne({email:email})
-//   if(!oldUser){
-//     return res.json(errors,"user not exist")
-//   }else{
-//     console.log(oldUser);
-//     // const token=jwt.sign({email:oldUser.email, id:oldUser._id},"Key",{expiresIn: '3d'})
-    // const token = jwt.sign({ sub: oldUser._id }, 'Key', { expiresIn: '3d' });
-    // const link=`http://localhost:5173/reset-password/${oldUser._id}/${token}'`;
-    // console.log(link);
-//   }
-//   } catch (error) {
-    
-//   }
-  
-// }
-
-// const ResetPassword=async (req,res,next)=>{
-//       const {id,token}=req.params;
-//       console.log("reset v",req.params);
-//       console.log(id,token);
-//       res.json("done")
-
-// }
-
-
-
-
-
-// const SendEmail=async (req,res,next)=>{
-//   try {
-//     const {email}=req.body
-//   console.log("otppppp",email);
-//   const oldUser=await userCollection.findOne({email:email})
-//   if(!oldUser){
-//     return res.json(errors,"user not exist")
-//   }else{
-//     console.log(oldUser);
-//     // const token=jwt.sign({email:oldUser.email, id:oldUser._id},"Key",{expiresIn: '3d'})
-//     const token = jwt.sign({ sub: oldUser._id }, 'Key', { expiresIn: '3d' });
-//     console.log("nodemaileeere")
-//     console.log("Token",token)
-//     console.log("ID",oldUser._id)
-//     const link=`http://localhost:4000/reset-password/${oldUser._id}/${token}`;
-//     console.log(link);
-//     const transporter = nodemailer.createTransport({
-//       host: "smtp.forwardemail.net",
-//       port: 465,
-//       secure: true,
-//       auth: {
-//         user: 'irshadalike11@gmail.com',
-//         pass: 'trlvooxiijvfoyzj'
-//       }
-//     });
-//     async function main() {
-//       const info = await transporter.sendMail({
-//         from: 'I-Club', // sender address
-//         to: oldUser.email, // list of receivers
-//         subject: "Your click the Link", // Subject line
-//         text: `link`, // plain text body
-//         //  html: "<b>Hello world?</b>",
-//       });
-    
-//       console.log("Message sent: %s", info.messageId);
-      
-//     }
-    
-//     main()
-//   }
-//   } catch (error) {
-    
-//   }
-  
-// }
-
-
-// passemail=req.body.useremail
-// console.log("llllllllllllllllllllllllllll");
-// if(passemail!=""){
-//   console.log(passemail);  
-// let checkmail = await userdata.findOne({ useremail:passemail })
-// let OtpCode = Math.floor(100000 + Math.random() * 900000)
-// otp = OtpCode
-// otpEmail = checkmail.useremail
-// let mailTransporter = nodemailer.createTransport({
-//   service: "gmail",
-//   auth: {
-//     user: "fammsstore11@gmail.com",
-//     pass: "paiteegvfdjqecwk"
-//   }
-// })
-// let docs = {
-//   from: "fammsstore11@gmail.com",
-//   to: otpEmail,
-//   subject: "Famms Varification",
-//   text: OtpCode + " Famms Verfication Code,Do not share with others"
-// }
-// mailTransporter.sendMail(docs, (err) => {
-//   if (err) {
-//     console.log(err)
-//   }
-// })
-// res.redirect('/user-otp')
-// }else{
-//   req.session.erremail="Invalid Email"
-//   res.redirect('/user-otpemail')
-// }
-
-// } catch (error) {
-// console.log(error);
-// next()
-// }
-
-// }
-
-
-
-// const SendEmail=async (req,res,next)=>{
-//   try {
-//     const {email}=req.body
-//   console.log("otppppp",email);
-//   const oldUser=await userCollection.findOne({email:email})
-//   if(!oldUser){
-//     return res.json({ errors: "user not exist" });
-//   }else{
-//     console.log(oldUser);
-      
-// const transporter = nodemailer.createTransport({
-//   host: "smtp.forwardemail.net",
-//   port: 465,
-//   secure: true,
-//   auth: {
-//     user: 'irshadalike11@gmail.com',
-//     pass: 'trlvooxiijvfoyzj'
-//   }
-// });
-// // Function to generate a random OTP
-// function generateOTP() {
-//   const digits = '0123456789';
-//   let OTP = '';
-//   for (let i = 0; i < 6; i++) {
-//     OTP += digits[Math.floor(Math.random() * 10)];
-//   }
-//   console.log(OTP);
-//   return OTP;
-// }
-
-
-// async function main() {
- 
-//   const otp = generateOTP();
-//   const info = await transporter.sendMail({
-//     from: 'I-Club', // sender address
-//     to: oldUser.email, // list of receivers
-//     subject: "Your One-Time Password (OTP)", // Subject line
-//     text: `Your OTP is: ${otp}`, // plain text body
-//      html: "<b>Hello world?</b>",
-//   });
-
-//   console.log("Message sent: %s", info.messageId);
-  
-// }
-
-// main()
-// .catch(console.error);
-//   }
-//   } catch (error) {
-    
-//   }
-  
-// }
-
- // Function to generate a random OTP
-//  function generateOTP() {
-//   const digits = '0123456789';
-//   let OTP = '';
-//   for (let i = 0; i < 6; i++) {
-//     OTP += digits[Math.floor(Math.random() * 10)];
-//   }
-//   console.log("Generated OTP:", OTP);
-//   return OTP;
-// }
+      //             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      // if (!emailRegex.test(email)) {
+      //   const errors = { email: 'Enter a valid email' };
+      //   return res.json({ errors, created: false });
+      // }
+      // else{ 
