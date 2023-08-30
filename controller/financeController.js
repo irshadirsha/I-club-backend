@@ -65,8 +65,28 @@ const AddExpense = async (req, res, next) => {
     }
 };
 
+const GetAccounts = async (req, res, next) => {
+    try {
+        const { clubName } = req.query;
+        console.log(clubName);
+        const club = await clubCollection.findOne({ clubName: clubName });
+        console.log(club);
+        const acc = await financeCollection.find({ clubName: club._id, status: true });
+        console.log(acc);
+        const totalIncome = acc.reduce((total, record) => total + record.amount, 0);
+        const accexp=await financeCollection.find({clubName:club._id,status:false})
+        const totalexpense = accexp.reduce((total,record)=> total + record.amount,0);
+        console.log(totalIncome,totalexpense);
+        res.json({ totalIncome,totalexpense });
 
- module.exports={GetFinaceData,AddExpense}
+    } catch (error) {
+       console.log("error in acounts");
+        res.status(500).json({ error: 'An error occurred' });
+    }
+};
+
+
+ module.exports={GetFinaceData,AddExpense,GetAccounts}
 
 
 

@@ -61,6 +61,7 @@ router.post('/create-payment',verifyToken,paymentController.MakePayment)
 //FINANCE CONTROLLER
 router.get('/get-financedata',verifyToken,finaceController.GetFinaceData)
 router.post('/add-expense',verifyToken,finaceController.AddExpense)
+router.get('/get-accounts',verifyToken,finaceController.GetAccounts)
 
 //NOTIFICATION CONTROLLER
 router.post('/send-note',verifyToken,notificationController.SendNote)
@@ -73,7 +74,8 @@ router.get('/get-message',verifyToken,chatController.GetChat)
 
 // VIDEOCALL CONTROLLER
 router.get('/get-meetingdata',verifyToken,chatController.GetMeetingData)
-
+router.post('/set-conferece',verifyToken,chatController.SetConference)
+router.post('/remove-link', verifyToken,chatController.RemoveLink)
 module.exports = router;
 
 

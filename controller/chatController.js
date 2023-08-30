@@ -55,12 +55,27 @@ const GetMeetingData=async (req,res,next)=>{
         return res.json({ error: "User role not found for the club" });
     }
     console.log(userRole);
-    return res.json({data:userRole});
+    return res.json({data:userRole, club});
     } catch (error) {
         console.log("errror in meeting get api");
     }
-
 }
+
+const SetConference =async (req,res,next)=>{
+    const {link,clubName}=req.body
+    console.log(link,clubName);
+    const linkadded = await clubCollection.updateOne({clubName:clubName},{$set:{link:link}})
+    console.log(linkadded);
+    res.json({linkadded})
+}
+const RemoveLink =async (req,res,next)=>{
+    const {clubName}=req.body
+    const linkremoved = await clubCollection.updateOne({clubName:clubName},{$set:{link:null}})
+    res.json({linkremoved})
+}
+
 module.exports = { SendMessage,
                    GetChat,
-                   GetMeetingData}
+                   GetMeetingData,
+                   SetConference,
+                   RemoveLink}
