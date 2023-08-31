@@ -13,6 +13,7 @@ const verifyToken = require('../middleware/auth')
 router.get('/',userController.userHome)
 
 router.post('/signup',userController.userSignup)
+router.post('/verify-otp',userController.VerifyOtp)
 
 router.post('/login',userController.userLogin)
 router.post('/sendmail',userController.SendEmail)
