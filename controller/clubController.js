@@ -692,8 +692,16 @@ const LeaveClub=async(req,res,next)=>{
   } catch (error) {
     
   }
-
 }
+
+ const PostLike = async (req,res,next)=>{
+  const userId=req.userId
+  const {clubName,postId}=req.body
+  console.log("likeee",userId,clubName,postId);
+  const data = await postCollection.updateOne({_id:postId},{$addToSet:{likes:userId}})
+  console.log(data);
+  res.json({message:"setttt"})
+ }
 module.exports = { regclub,
                    joinClub,
                    ClubHome,
@@ -711,7 +719,8 @@ module.exports = { regclub,
                    MakeRequest,
                    FetchCount,
                    DeletePost,
-                   LeaveClub}
+                   LeaveClub,
+                   PostLike}
 
 
 

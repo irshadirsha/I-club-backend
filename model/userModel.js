@@ -9,6 +9,7 @@ const userSchema = new mongoose.Schema({
       gender:{type:String},
       image:{type:String},
       isBlock:{type:Boolean,default:false},
+      like:{type:String,default:null},
       clubs:[
             {
               clubName:{

@@ -10,10 +10,21 @@ const postSchema=new mongoose.Schema({
         type:String,
         default:null
       },
+      date: {
+        type: Date,
+        default: Date.now,
+        required: true
+      },
       desc:{
         type:String,
         default:null
       },
+      likes: [
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "user"
+        }
+      ]
 });
 
 module.exports=mongoose.model("Post",postSchema);

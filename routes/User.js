@@ -46,6 +46,7 @@ router.post('/add-clubprofile',verifyToken,clubController.AddClubProfile)
 router.post('/add-clubpost',verifyToken,clubController.AddClubPost)
 router.get('/get-clubprofile',verifyToken,clubController.GetClubProfile)
 router.post('/delete-post',verifyToken,clubController.DeletePost)
+router.post('/post-like',verifyToken,clubController.PostLike)
 
 // UPDATE IN CLUB DATA
 router.post('/update-club',verifyToken,clubController.UpdateClub)
