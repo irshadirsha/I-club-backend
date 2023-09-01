@@ -40,11 +40,22 @@ const regclub = async (req, res, next) => {
         errors: "treasurer not available"
       })
     }
-    if (presidentIsIn.email === secretory || presidentIsIn.email === treasurer) {
+    // if (presidentIsIn.email === secretory || presidentIsIn.email === treasurer) {
+    //   return res.json({
+    //     errors: "You will get a president role, so you cant be a treasurer or secretory!"
+    //   })
+    // }
+    if (presidentIsIn.email === secretory) {
       return res.json({
-        errors: "You will get a president role, so you cant be a treasurer or secretory!"
+        errors: "You will get a president role, so you cant be a secretory!"
       })
     }
+    if (presidentIsIn.email === treasurer) {
+      return res.json({
+        errors: "You will get a president role, so you cant be a treasurer!"
+      })
+    }
+    
     
       const saltRounds = await bcrypt.genSalt(10)
       const hashedcode = await bcrypt.hash(securityCode, saltRounds)
