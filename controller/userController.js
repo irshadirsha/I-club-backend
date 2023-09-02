@@ -31,15 +31,19 @@ const userSignup = async (req,res,next)=>{
       const existemail=await userCollection.findOne({email:email})
       console.log("Google",existemail);
        if(existemail){
-        console.log("",existemail);
-        const token = jwt.sign({ sub: existemail._id }, process.env.jwtSecretKey, { expiresIn: '3d' });
-        console.log(token,"---------------------------");
+        console.log("--------------------------------",existemail);
+        console.log("--------------------------------",existemail.Role);
+
+        const token = jwt.sign({ sub: existemail._id ,  Role:existemail.Role}, process.env.jwtSecretKey, { expiresIn: '3d' });
+        console.log(token,"----");
         res.json({ user:existemail,token, created: true });
        }else{
         const hashedPassword = await bcrypt.hash(password, 10);
       const data= await userCollection.create({username,email,password:hashedPassword})
       console.log("inserted succesfully",data);
-       const token = jwt.sign({ sub: data._id }, process.env.jwtSecretKey, { expiresIn: '3d' });
+      const Role=data.Role
+      console.log("role-------------------------------------------------------------------------------------in",Role);
+       const token = jwt.sign({ sub: data._id, Role:Role}, process.env.jwtSecretKey, { expiresIn: '3d' });
       return res.json({user:data,token,created:true})
        }        
 
@@ -106,7 +110,8 @@ const VerifyOtp = async (req, res, next) => {
       if (matchedOtp) {
           console.log('Matching OTP and email found');
           const data=await userCollection.findOne({email:email})
-          const token = jwt.sign({ sub: data._id }, process.env.jwtSecretKey, { expiresIn: '3d' });
+          const Role=data.Role
+          const token = jwt.sign({ sub: data._id, Role:Role }, process.env.jwtSecretKey, { expiresIn: '3d' });
           // return res.json({ message: 'Matching OTP  found' });
           res.json({data,token,created:true})
       } else {
@@ -134,10 +139,11 @@ const userLogin = async (req, res, next) => {
           const errors = { email: 'You are blocked by Admin'};
           return res.json({ errors, created: false });
         }
-        console.log("nowwwwww",user);
+        const Role=user.Role
+        console.log("nowwwwww",Role);
         if (await bcrypt.compare(password, user.password)) {
           console.log("logged successfully");
-          const token = jwt.sign({ sub: user._id }, process.env.jwtSecretKey, { expiresIn: '3d' });
+          const token = jwt.sign({ sub: user._id, Role:Role }, process.env.jwtSecretKey, { expiresIn: '3d' });
           res.json({userData: user,token, user: true});
         } else {
           console.log("password wrong");

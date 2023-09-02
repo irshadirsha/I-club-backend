@@ -10,6 +10,7 @@ const userSchema = new mongoose.Schema({
       image:{type:String},
       isBlock:{type:Boolean,default:false},
       like:{type:String,default:null},
+      Role:{type:String,default:"User"},
       clubs:[
             {
               clubName:{

@@ -17,7 +17,7 @@ const adminsingin = async (req, res) => {
     if(admin){
         if(admin.password===password){
             console.log("succefully logged")
-            const token=jwt.sign({sub:admin._id},process.env.jwtSecretKey,{expiresIn:'3d'})
+            const token=jwt.sign({sub:admin._id, Role:admin.Role},process.env.jwtSecretKey,{expiresIn:'3d'})
             console.log(token,"---------------------------");
             return res.json({admin:admin,token,created:true})
 

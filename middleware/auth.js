@@ -2,15 +2,13 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 const verifyToken =async  (req, res, next) => {
-  console.log('Middleware executedddddddddddddddddddddddddddddddddddddddddddd');
-  // console.log(req.headers)
   if(!req.headers.authorization){
     return 
   }
   
 const token = req.headers.authorization.split(" ")[1];
   // const token=token1.toString()
-  console.log(token, '----------------------token');
+  // console.log(token, '----------------------token');
   if (!token) {
     return res.status(401).json({ message: 'Token not provided' });
   }
@@ -18,8 +16,14 @@ const token = req.headers.authorization.split(" ")[1];
   try {
     const data = jwt.verify(token,process.env.jwtSecretKey);
     req.userId = data.sub;
-     console.log("midddddd",req.userId);
-    next();
+    //  console.log("midddddd",req.userId);
+    //  console.log("midddddddata",data);
+     const action=data.Role
+    //  console.log(action);
+     if( action === "User"){
+      console.log("MATCHING")
+       next();
+     }
   } catch (error) {
     console.log(error)
     return res.status(403).json({ message: 'Token expired or invalid' });
@@ -41,36 +45,6 @@ module.exports = verifyToken;
 
 
 
-
-
-
-
-
-
-// const jwt = require('jsonwebtoken');
-// require('dotenv').config()
-
-// const verifyToken = (req, res, next) => {
-//   console.log('Middleware executedddddddddddddddddddddddddddddddddddddddddddd');
-//   const token = req.headers.authorization;
-//   console.log(token);
-//   if (!token) {
-//     return res.status(401).json({ message: 'Token not provided' });
-//   }
-//  console.log(process.env.jwtSecretKey);
-// const data=  jwt.verify(token, process.env.jwtSecretKey, (err, decoded) => {
-//     if (err) {
-//       return res.status(403).json({ message: 'Token expired or invalid' });
-//     console.log("Token expired or invalid");
-//     }
-//     req.userId = decoded.sub;
-//     console.log(req.userId);
-//     console.log("exicuted fully");
-//     next();
-//   });
-// };
-
-// module.exports = verifyToken;
 
 
 
