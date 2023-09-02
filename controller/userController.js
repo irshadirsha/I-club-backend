@@ -140,7 +140,7 @@ const userLogin = async (req, res, next) => {
           return res.json({ errors, created: false });
         }
         const Role=user.Role
-        console.log("nowwwwww",Role);
+        console.log("nowwwwwwkkkkkkkkkkkk.....",Role);
         if (await bcrypt.compare(password, user.password)) {
           console.log("logged successfully");
           const token = jwt.sign({ sub: user._id, Role:Role }, process.env.jwtSecretKey, { expiresIn: '3d' });

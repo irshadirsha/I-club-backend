@@ -7,8 +7,6 @@ const verifyToken =async  (req, res, next) => {
   }
   
 const token = req.headers.authorization.split(" ")[1];
-  // const token=token1.toString()
-  // console.log(token, '----------------------token');
   if (!token) {
     return res.status(401).json({ message: 'Token not provided' });
   }
@@ -16,10 +14,8 @@ const token = req.headers.authorization.split(" ")[1];
   try {
     const data = jwt.verify(token,process.env.jwtSecretKey);
     req.userId = data.sub;
-    //  console.log("midddddd",req.userId);
-    //  console.log("midddddddata",data);
      const action=data.Role
-    //  console.log(action);
+     console.log(action);
      if( action === "User"){
       console.log("MATCHING")
        next();
