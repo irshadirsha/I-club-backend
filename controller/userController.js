@@ -4,9 +4,6 @@ const jwt = require('jsonwebtoken');
 const bcrypt =require('bcrypt')
 const nodemailer = require("nodemailer");
 require('dotenv').config();
-// const sendEmail = require('../sendEmail/emailSend')
-// const { ObjectId } = require('mongodb');
-// const cloudinary = require('cloudinary').v2;
 
 const  ImageUpdate=async(req,res,next)=>{
   const { imageUrl } = req.body;
