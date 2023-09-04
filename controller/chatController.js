@@ -66,12 +66,12 @@ const SetConference =async (req,res,next)=>{
     console.log(link,clubName);
     const linkadded = await clubCollection.updateOne({clubName:clubName},{$set:{link:link}})
     console.log(linkadded);
-    res.json({linkadded})
+    res.json({linkadded,message:"Link Successfully Shared"})
 }
 const RemoveLink =async (req,res,next)=>{
     const {clubName}=req.body
     const linkremoved = await clubCollection.updateOne({clubName:clubName},{$set:{link:null}})
-    res.json({linkremoved})
+    res.json({linkremoved,message:"Link successfully Removed"})
 }
 
 module.exports = { SendMessage,
