@@ -1,10 +1,10 @@
 const mongoose = require ('mongoose')
-
+require('dotenv').config();
 const connect = ()=>{
-    mongoose.connect('mongodb://127.0.0.1:27017/club', {useNewUrlParser: true, useUnifiedTopology: true,}).then(()=>{
-       console.log("db connected");
+    mongoose.connect('mongodb+srv://irshadalike:irshad111@cluster0.cwnzwvu.mongodb.net/club', {useNewUrlParser: true, useUnifiedTopology: true,}).then(()=>{
+        console.log("db connected");
     })
-   
+    
 }
 
 module.exports = connect;
