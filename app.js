@@ -8,7 +8,7 @@ const http = require ('http');
 require('dotenv').config();
 
 // const bodyParser = require('body-parser');
-var userRouter = require('./routes/user');
+var userRouter = require('./routes/User');
 const adminRouter = require('./routes/Admin');
 
 var app = express();
