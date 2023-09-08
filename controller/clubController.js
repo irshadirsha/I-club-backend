@@ -7,7 +7,7 @@ const { BulkWriteOperation } = require('mongodb');
 const postCollection = require('../model/clubPostModel')
 const chatCollection = require('../model/chatModel');
 const bcrypt = require('bcrypt');
-
+const axios = require('axios');
 const regclub = async (req, res, next) => {
   try {
     console.log("reached");
@@ -668,6 +668,21 @@ const LeaveClub=async(req,res,next)=>{
   console.log(data);
   res.json({message:"setttt"})
  }
+
+ const GetNews =async (req,res,next)=>{
+  try {
+ 
+    const apiKey = '1c58477c8f25464b99f032ff79cfb601'
+    const apiUrl = `https://newsapi.org/v2/top-headlines?country=in&category=sports&apiKey=${apiKey}`
+    const response = await axios.get(apiUrl);
+    const newsData = response.data.articles;
+    console.log(newsData)
+    res.json(newsData);
+  } catch (error) {
+    console.error('Error fetching news:', error);
+    res.status(500).json({ error: 'An error occurred while fetching news.' });
+  }
+ }
 module.exports = { regclub,
                    joinClub,
                    ClubHome,
@@ -686,7 +701,8 @@ module.exports = { regclub,
                    FetchCount,
                    DeletePost,
                    LeaveClub,
-                   PostLike}
+                   PostLike,
+                   GetNews}
 
 
 

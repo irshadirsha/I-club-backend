@@ -78,6 +78,9 @@ router.get('/get-message',verifyToken,chatController.GetChat)
 router.get('/get-meetingdata',verifyToken,chatController.GetMeetingData)
 router.post('/set-conferece',verifyToken,chatController.SetConference)
 router.post('/remove-link', verifyToken,chatController.RemoveLink)
+
+// NEWS API
+router.get('/api/news',verifyToken,clubController.GetNews)
 module.exports = router;
 
 
