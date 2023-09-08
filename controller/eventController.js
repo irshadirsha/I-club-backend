@@ -7,7 +7,6 @@ const AddEvents = async (req, res, next) => {
     try {
       const userId = req.userId;
       const { messages,club} = req.body;
-      console.log("----------",messages, userId);
       const clubdata = await clubCollection.findOne({ _id: club });
   
       if (!clubdata) {
@@ -29,7 +28,6 @@ const AddEvents = async (req, res, next) => {
       });
   
       const added = await event.save();
-      console.log("added successfully");
       return res.json({ added,message: "event added successfully" })
     } catch (error) {
       res.status(500).json({ error: "An error occurred" });
@@ -39,10 +37,8 @@ const AddEvents = async (req, res, next) => {
   const GetEvents=async(req,res,next)=>{
     try {
         const {clubName}=req.body
-        console.log("get club",clubName);
         const club=await clubCollection.findOne({clubName:clubName})
       const eventdata= await eventCollection.find({clubName:club._id}).sort({date:-1})
-      console.log(eventdata);
       const modifiedEventData = eventdata.map(event => ({
         event:event.event,
         location:event.location,
@@ -51,7 +47,6 @@ const AddEvents = async (req, res, next) => {
         date: event.date,
         _id:event._id
       }));
-      console.log(modifiedEventData);
       res.json({modifiedEventData}) 
     } catch (error) {
         console.log("error occured")
@@ -61,7 +56,6 @@ const AddEvents = async (req, res, next) => {
   const DeleteEvent=async(req,res,next)=>{
     try {
         const {id}=req.body
-    console.log("deleteeeeee",id) 
     let deleted = await eventCollection.deleteOne({ _id:id })
     res.json({deleted,message:"deleted successfully"});
     } catch (error) {

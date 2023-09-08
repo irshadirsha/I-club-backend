@@ -15,13 +15,11 @@ const token = req.headers.authorization.split(" ")[1];
     const data = jwt.verify(token,process.env.jwtSecretKey);
     req.userId = data.sub;
      const action=data.Role
-     console.log(action);
      if( action === "User"){
       console.log("MATCHING")
        next();
      }
   } catch (error) {
-    console.log(error)
     return res.status(403).json({ message: 'Token expired or invalid' });
   }
 };

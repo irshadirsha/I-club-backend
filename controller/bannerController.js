@@ -5,7 +5,6 @@ const jwt = require('jsonwebtoken');
 
 const GetBannerHome= async (req,res,next)=>{
     try {
-        console.log("calling.......");
         const homedata=await bannerCollection.find()
         res.json({data:homedata})
     } catch (error) {

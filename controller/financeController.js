@@ -8,7 +8,6 @@ const GetFinaceData = async (req, res, next) => {
     try {
         const userId = req.userId;
         const { clubName } = req.query;
-        
         const clubExist = await clubCollection.findOne({ clubName: clubName });
         if (!clubExist) {
             return res.json({ error: "Club not found" });
@@ -39,10 +38,7 @@ const GetFinaceData = async (req, res, next) => {
 const AddExpense = async (req, res, next) => {
     try {
         const { clubName, name, amount, reason, date } = req.body;
-        console.log(clubName, name, amount, reason, date);
-
         const clubExist = await clubCollection.findOne({ clubName: clubName });
-
         if (clubExist) {
             const finance = new financeCollection({
                 clubName: clubExist._id,
@@ -60,7 +56,6 @@ const AddExpense = async (req, res, next) => {
             res.status(400).json({ error: "Club not found" });
         }
     } catch (error) {
-        console.log("Error occurred:", error);
         res.status(500).json({ error: "Internal server error" });
     }
 };
@@ -68,19 +63,14 @@ const AddExpense = async (req, res, next) => {
 const GetAccounts = async (req, res, next) => {
     try {
         const { clubName } = req.query;
-        console.log(clubName);
         const club = await clubCollection.findOne({ clubName: clubName });
-        console.log(club);
         const acc = await financeCollection.find({ clubName: club._id, status: true });
-        console.log(acc);
         const totalIncome = acc.reduce((total, record) => total + record.amount, 0);
         const accexp=await financeCollection.find({clubName:club._id,status:false})
         const totalexpense = accexp.reduce((total,record)=> total + record.amount,0);
-        console.log(totalIncome,totalexpense);
         res.json({ totalIncome,totalexpense });
 
     } catch (error) {
-       console.log("error in acounts");
         res.status(500).json({ error: 'An error occurred' });
     }
 };

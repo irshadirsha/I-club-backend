@@ -7,10 +7,8 @@ const SendMessage= async (req,res,next)=>{
     try {
         const userId=req.userId
         const {clubName,text}=req.body
-        console.log(clubName,text,userId);
         const user = await userCollection.findOne({_id:userId})
         const club = await clubCollection.findOne({clubName:clubName})
-        console.log("11111111111111111111111111111111",user,club);
         const chat=new chatCollection({
             user: user._id,
             room: club._id,
@@ -28,7 +26,6 @@ const GetChat= async (req,res,next)=>{
     try {
         const { clubName } = req.query;
         const userId=req.userId
-        console.log(clubName,userId);
         const club=await clubCollection.findOne({clubName:clubName})
         const getchat=await chatCollection.find({room:club._id}).sort({ date: 1 }).populate('user')
         const getchatWithUserId = getchat.map(message => ({
@@ -47,7 +44,6 @@ const GetMeetingData=async (req,res,next)=>{
     try {
         const{clubName}=req.query
         const userId=req.userId
-        console.log("videooooooo",userId,clubName);
         const club= await clubCollection.findOne({clubName:clubName})
         const user=await userCollection.findOne({_id:userId})
         const userRole = user.clubs.find(clubItem => clubItem.club.toString() === club._id.toString())?.role;
@@ -57,15 +53,12 @@ const GetMeetingData=async (req,res,next)=>{
     console.log(userRole);
     return res.json({data:userRole, club});
     } catch (error) {
-        console.log("errror in meeting get api");
     }
 }
 
 const SetConference =async (req,res,next)=>{
     const {link,clubName}=req.body
-    console.log(link,clubName);
     const linkadded = await clubCollection.updateOne({clubName:clubName},{$set:{link:link}})
-    console.log(linkadded);
     res.json({linkadded,message:"Link Successfully Shared"})
 }
 const RemoveLink =async (req,res,next)=>{

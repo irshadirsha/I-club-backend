@@ -7,7 +7,6 @@ const sendEmail = require('../sendEmail/emailSend')
 const SendNote = async (req, res, next) => {
     try {
         const { note, clubName } = req.body;
-        console.log(note, clubName);
         const club = await clubCollection.findOne({ clubName: clubName })
             .populate('president').populate('secretory').populate('treasurer');
 
@@ -30,10 +29,6 @@ const SendNote = async (req, res, next) => {
             sendEmail(treasurerEmail, `Notification from I-club : ${clubName}`, note);
         }
 
-        console.log(presidentEmail);
-        console.log(secretoryEmail);
-        console.log(treasurerEmail);
-
         const clubId = club._id;
         console.log(clubId);
 
@@ -52,12 +47,9 @@ const SendNote = async (req, res, next) => {
         if (populatedMembers) {
             const memberEmails = populatedMembers.members.map((member) => member.email);
 
-            console.log("member", memberEmails);
-
             // Sending notifications to all club members
             memberEmails.forEach((memberEmail) => {
                 sendEmail(memberEmail, `Notification from I-club : ${clubName}`, note);
-                console.log(memberEmail, "-------------");
             });
         }
 
@@ -73,7 +65,6 @@ const SendNote = async (req, res, next) => {
 const GetNote=async(req,res,next)=>{
     const { clubName } = req.query;
     const userId = req.userId;
-    console.log(clubName,userId);
     const club=await clubCollection.findOne({clubName:clubName})
     if (!club) {
         return res.json({ error: "Club not found" });
@@ -94,7 +85,6 @@ const GetNote=async(req,res,next)=>{
 const DeleteNote= async(req,res,next)=>{
     try {
         const {deleteid}=req.body
-        console.log("delete ---------id",deleteid)
         let deleted = await notificationCollection.deleteOne({_id:deleteid})
         res.json({deleted,message:"Notification deleted Successfully"})
     } catch (error) {

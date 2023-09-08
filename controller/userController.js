@@ -8,7 +8,6 @@ require('dotenv').config();
 const  ImageUpdate=async(req,res,next)=>{
   const { imageUrl } = req.body;
   const user=req.userId
-  console.log("url",imageUrl,user);
   await userCollection.updateOne({_id:user},{$set:{image:imageUrl}})
   console.log("image updated successfully");
   return res.json({status:true,message:"image updated successfully"})
@@ -19,27 +18,19 @@ const userHome = (req,res)=>{
 
 const userSignup = async (req,res,next)=>{
    try {
-    console.log("signup------------");
     const isGoogleSignup = req.body.isGoogleSignup;
     // google signup
     if (isGoogleSignup) {
       const {username,email,password}=req.body
       
       const existemail=await userCollection.findOne({email:email})
-      console.log("Google",existemail);
        if(existemail){
-        console.log("--------------------------------",existemail);
-        console.log("--------------------------------",existemail.Role);
-
         const token = jwt.sign({ sub: existemail._id ,  Role:existemail.Role}, process.env.jwtSecretKey, { expiresIn: '3d' });
-        console.log(token,"----");
         res.json({ user:existemail,token, created: true });
        }else{
         const hashedPassword = await bcrypt.hash(password, 10);
       const data= await userCollection.create({username,email,password:hashedPassword})
-      console.log("inserted succesfully",data);
       const Role=data.Role
-      console.log("role-------------------------------------------------------------------------------------in",Role);
        const token = jwt.sign({ sub: data._id, Role:Role}, process.env.jwtSecretKey, { expiresIn: '3d' });
       return res.json({user:data,token,created:true})
        }        
@@ -47,10 +38,7 @@ const userSignup = async (req,res,next)=>{
     }else{
           //form signup
     const {username,email,password}=req.body
-    console.log("else case",username,email,password);
     const existemail=await userCollection.find({email:email})
-   console.log(existemail);
-
     if(existemail.length>0){
         const errors={email:"email is already exists"}
         return res.json({errors,created:false})
@@ -86,11 +74,8 @@ const userSignup = async (req,res,next)=>{
   
       mailTransporter.sendMail(mailOptions, (err) => {
         if (err) {
-            console.log('Error sending email:', err);
             return res.json({ errors: 'Error sending the OTP email.' });
         }
-     
-        console.log('OTP email sent successfully.');
         return res.json({ message: 'Check Your Mail for OTP Verification' });
     });
       }  
@@ -101,18 +86,15 @@ const userSignup = async (req,res,next)=>{
 
 const VerifyOtp = async (req, res, next) => {
   const { otp, email } = req.body;
-  console.log(otp, email);
   try {
       const matchedOtp = await otpCollection.findOne({ users: email, otp: otp });
       if (matchedOtp) {
-          console.log('Matching OTP and email found');
           const data=await userCollection.findOne({email:email})
           const Role=data.Role
           const token = jwt.sign({ sub: data._id, Role:Role }, process.env.jwtSecretKey, { expiresIn: '3d' });
           // return res.json({ message: 'Matching OTP  found' });
           res.json({data,token,created:true})
       } else {
-          console.log('No matching OTP and email found');
           return res.json({ errors: 'Invalid OTP ' });
       }
   } catch (error) {
@@ -125,11 +107,7 @@ const VerifyOtp = async (req, res, next) => {
 
 const userLogin = async (req, res, next) => {
   try {
-    console.log("llllllllllllllllllooooooogin");
     const { email, password } = req.body; 
-    console.log(email);
-    console.log(password);
-
       const user = await userCollection.findOne({ email: email });
       if (user) {
         if(user.isBlock==true){
@@ -137,23 +115,18 @@ const userLogin = async (req, res, next) => {
           return res.json({ errors, created: false });
         }
         const Role=user.Role
-        console.log("nowwwwwwkkkkkkkkkkkk.....",Role);
         if (await bcrypt.compare(password, user.password)) {
-          console.log("logged successfully");
           const token = jwt.sign({ sub: user._id, Role:Role }, process.env.jwtSecretKey, { expiresIn: '3d' });
           res.json({userData: user,token, user: true});
         } else {
-          console.log("password wrong");
           const errors = { password: "Password is wrong.." };
           res.json({ errors, user: false });
         }
       } else {
-        console.log("email not exist");
         const errors = { email: "Email does not exist.." };
         res.json({ errors, user: false });
       } 
   } catch (error) {
-    console.log("error:", error.message);
     res.json({ error: "An error occurred" });
   }
 };
@@ -162,7 +135,6 @@ const userLogin = async (req, res, next) => {
 const SendEmail = async (req, res, next) => {
   try {
     const { email } = req.body;
-    console.log("Email to be sent:", email);
 
     // Check if the email exists in the database
     const oldUser = await userCollection.findOne({ email: email });
@@ -170,13 +142,10 @@ const SendEmail = async (req, res, next) => {
       return res.json({ errors: "User does not exist" });
     }
     
-     const token=oldUser.password
-    console.log(token);
-    
-   
+     const token=oldUser.password   
     
     const link=`http://localhost:5173/reset-password?userId=${oldUser._id}&token=${token}`;
-    console.log(link);
+
     let mailTransporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -201,21 +170,17 @@ const SendEmail = async (req, res, next) => {
         return res.json({ errors: "Error sending the verification email." });
       }
 
-      console.log("Email sent successfully.");
       return res.json({ status:true,success: "Email sent successfully." });
     });
   } catch (error) {
-    console.error("Error:", error);
     return res.status(500).json({ errors: "An error occurred while processing the request." });
   }
 };
 const ResetPassword = async (req, res, next) => {
-  console.log('reset');
+
   console.log(req.query);
   const { userId: id, token } = req.query;
-  console.log("reset dfdfdfv", id, token);
   const oldUser = await userCollection.findOne({ _id: id });
-  console.log("finall", oldUser);
   if (!oldUser) {
     return res.json({ errors: "User does not exist" });
   }
@@ -236,7 +201,6 @@ const SetNewPass=async(req,res,next)=>{
  try {
   const { email } = req.body;
   const {password}=req.body;
-  console.log(email,password)
   const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
   if (!passwordRegex.test(password)) {
     const errors = { password: 'Enter a valid password' };
@@ -246,14 +210,12 @@ const SetNewPass=async(req,res,next)=>{
   if(check){
     const hashedPassword = await bcrypt.hash(password, 10);
     await userCollection.updateOne({ email: email }, { $set: { password: hashedPassword } });
-    console.log("updated")
       res.json({status:true, success: "updation successful." });
-      console.log("jjjjjjjjj");
   }else{
     res.json({status:false,errors:"updation failed"}) 
   } 
  } catch (error) {
-  console.log(error)
+  console.log("error")
  }
 }
 
@@ -261,9 +223,7 @@ const updateProfile=async(req,res,next)=>{
   try {
     const userId = req.userId;
     const {username,gender,phone,address}=req.body
-    console.log(username,gender,phone,address);
     const userExist=await userCollection.findOne({_id:userId})
-    console.log(userExist)
     if(userExist){
       await userCollection.updateOne({email:userExist.email},
         {$set:{username:username,gender:gender,phone:phone,address:address}})
@@ -282,16 +242,8 @@ const GetProfile = async (req, res, next) => {
   try {
     const userId = req.userId;
     const userdata = await userCollection.findOne({ _id: userId }).populate('clubs.club')
-      // .populate({
-      //   path: 'clubs.club',   // Use dot notation to access the club field within clubs array
-      //   model: 'clubdata',    // Specify the model to populate from
-      //   select: '-members'    // Exclude the members field from clubdata
-      // })
-      // .exec();
-    console.log("get profile-------", userdata);
     res.json({ userdata });
   } catch (error) {
-    console.log("Error occurred:", error);
     res.status(500).json({ message: "An error occurred" });
   }
 };
@@ -300,8 +252,6 @@ const GetProfile = async (req, res, next) => {
 
 const googleoAuth =async (req,res,next)=>{
      const {datas}=req.body
-     console.log("newwwwwwwww");
-     console.log(datas);
 }
 
 

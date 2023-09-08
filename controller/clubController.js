@@ -14,7 +14,6 @@ const regclub = async (req, res, next) => {
     const userId = req.userId;
     const president=userId
     const { clubName, registerNo, address, category, securityCode, secretory, treasurer } = req.body
-    console.log(clubName, registerNo, address, category, securityCode, secretory, treasurer, president)
     const bulkUpdateOperations = [];
     const clubexist = await clubCollection.findOne({ clubName: clubName })
     if (clubexist) {
@@ -136,7 +135,6 @@ const joinClub = async (req, res, next) => {
       await userCollection.updateOne({ _id: userId },{$addToSet: {clubs: {$each: [ {
         clubName: clubExist.clubName,password: clubExist.securityCode,club: clubExist._id,role: "member",
      }]}}});
-      console.log("Inserted into user's clubs array");
     }
 
     const userCheck = await userCollection.findOne({ _id: userId });
@@ -189,7 +187,6 @@ const ClubHome = async (req, res, next) => {
   try {
     const userId = req.userId;
     const { clubName } = req.body;
-    console.log( clubName);
      const userdata=await userCollection.findOne({_id:userId})
      const getclubdata=await clubCollection.findOne({clubName:clubName})
      .populate('president').populate('secretory').populate('treasurer')
@@ -199,8 +196,6 @@ const ClubHome = async (req, res, next) => {
      if (!userRole) {
          return res.json({ error: "User role not found for the club" });
      }
-    
-     console.log(userdata)
      res.json({data:clubdatas,user:user,userRole:userRole})
   } catch (error) {
     next(error);
@@ -211,9 +206,7 @@ const GetClubAuthority = async (req, res, next) => {
   try {
     const { clubName } = req.query;
     const userId = req.userId;
-    console.log("authority", clubName, userId);
     const userExist=await userCollection.findOne({_id:userId})
-    // Find the club by clubname and populate the specified fields
       const clubExist=await clubCollection.findOne({clubName:clubName})
       .populate('president').populate('secretory').populate('treasurer')
     console.log(clubExist);
@@ -223,7 +216,6 @@ const GetClubAuthority = async (req, res, next) => {
     // }
     res.json({ data: clubExist });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ error: 'An error occurred' });
   }
 };
@@ -232,7 +224,6 @@ const AddMember=async(req,res,next)=>{
   try {
     const { clubName, adduser } = req.body;
     const userId=req.userId;
-    console.log("ADDMEMMBERRRrrrrrrrrr",clubName,userId,adduser);
     const club=await clubCollection.findOne({clubName:clubName})
     console.log(club)
     let head = await userCollection.findOne({ _id: userId });
@@ -283,7 +274,6 @@ const AddMember=async(req,res,next)=>{
      }]}}});
     }
 
-    console.log("Inserted into user's clubs array");
   }
   
     let gettingMember = await clubCollection.findById(club._id)
@@ -298,17 +288,14 @@ const GetMember=async(req,res,next)=>{
   try {
     const { clubName } = req.query;
     const userId=req.userId
-    console.log("getmember",clubName,userId);
     const userExist=await userCollection.findOne({_id:userId})
     const clubExist=await clubCollection.findOne({clubName:clubName}).populate('members')
-    console.log("-------------------",clubExist)
     const userRole = userExist.clubs.find(clubItem => clubItem.club.toString() === clubExist._id.toString())?.role;
     if (!userRole) {
         return res.json({ error: "User role not found for the club" });
     }
     res.json({clubExist,userRole})
   } catch (error) {
-    console.log("error occur in get member")
   }
 }
 const DeleteMember=async(req,res,next)=>{
@@ -316,10 +303,8 @@ const DeleteMember=async(req,res,next)=>{
     const {id,clubName}=req.body
     const userId=req.userId
     const user=await userCollection.findOne({_id:userId})
-    console.log(id,clubName);
     const memberdlt=await userCollection.findOne({_id:id})
     const club = await clubCollection.updateOne({clubName:clubName},{$pull:{members:id}})
-   console.log(club);
   
    const memb=memberdlt.username
     sendEmail(
@@ -348,19 +333,15 @@ const DeleteMember=async(req,res,next)=>{
 const AddClubProfile=async (req,res,next)=>{
   try {
     const {clubName,imageUrl}=req.body
-    console.log(imageUrl,clubName);
    await clubCollection.updateOne({clubName:clubName},{$set:{clubimg:imageUrl}})
-   console.log("image updated successfully");
    return res.json({status:true,message:"Image added successfully"})
   } catch (error) {
-    console.log("error occur in club profile adding")
   }
 }
 
 const AddClubPost = async (req,res,next)=>{
   try {
     const {clubName,postimageUrl,description}=req.body
-    console.log(clubName,postimageUrl,description)
      const club = await clubCollection.findOne({clubName:clubName})
     if (!club) {
       return res.json({ message: "Club not found" });
@@ -373,7 +354,6 @@ const AddClubPost = async (req,res,next)=>{
     await newPost.save()
     res.json({message:"club post added successfully"})
   } catch (error) {
-    console.log("error occur in addpostclub")
   }
 
 }
@@ -382,7 +362,6 @@ const GetClubProfile = async (req,res,next)=>{
   try {
     const { clubName } = req.query;
     const userId = req.userId;
-    console.log("get profile",clubName,userId);
     const user=await userCollection.findOne({_id:userId})
     const clubExist=await clubCollection.findOne({clubName:clubName}).populate('members')
     console.log(clubExist)
@@ -391,11 +370,8 @@ const GetClubProfile = async (req,res,next)=>{
           return res.json({ errors: "User role not found for the club" });
       }
       const postdata=await postCollection.find({clubName:clubExist._id})
-      console.log(postdata)
-
       res.json({clubExist,userRole,postdata})   
   } catch (error) {
-    console.log("error occr in get profiledata")
   }
 }
 
@@ -416,11 +392,8 @@ const DeletePost = async (req, res, next) => {
 
 const UpdateClub = async (req, res, next) => {
   try {
-    console.log("calleeeddd");
     const { category, registerNo, address, about, clubName, club } = req.body;
-    console.log("updationnnnnnnnn", category, registerNo, address, about, clubName, club); 
     const clubExist = await clubCollection.findOne({ clubName: club });
-    console.log(clubExist);
     const clubnameFound = await clubCollection.findOne({ clubName: clubName });
     if (clubnameFound) {
       if (
@@ -510,10 +483,8 @@ const UpdateClub = async (req, res, next) => {
     }
     
     const getclub = await clubCollection.findOne({ _id: clubExist._id });
-    console.log("--------------------------------------", getclub);
     res.json({ getclub, message: "successfully updated" });
   } catch (error) {
-    console.log("error occur in updation of club", error);
     res.json({ message: "An error occurred during club update" });
   }
 };
@@ -521,21 +492,16 @@ const UpdateClub = async (req, res, next) => {
 const GetClubForm=async(req,res,next)=>{
   try {
     const {clubName}=req.query
-    console.log(clubName);
     const club=await clubCollection.findOne({clubName:clubName})
-    console.log(club);
     res.json({club})
   } catch (error) {
-    console.log("error occur in get clubform data")
   }
 }
 
 const ChangeCommitte=async(req,res,next)=>{
   try {
     const {clubName,president,secretory,treasurer}=req.body
-    console.log(clubName,president,secretory,treasurer)
     const userId=req.userId
-    console.log(userId);
     const user=await userCollection.findOne({_id:userId})
     let presidentExist = await userCollection.findOne({ email: president });
     if (!presidentExist) {
@@ -556,7 +522,6 @@ const ChangeCommitte=async(req,res,next)=>{
       });
     }
     let club = await clubCollection.findOne({clubName:clubName});
-    console.log(club);
     let data = new Set();
     data.add(club.president.toString())
     data.add(club.secretory.toString())
@@ -619,7 +584,6 @@ const ChangeCommitte=async(req,res,next)=>{
     sendEmail(treasurerExist.email, `I-club Commitee Change",'Hello,\n\nSubject: Invitation to Join as Treasurer - ${clubDetails.clubName}\n\nI hope this email finds you in good spirits. On behalf of ${clubDetails.clubName},  warmest congratulations and invite you to join our club as the new TReasurer.\n\n\n\nBest regards,\n\n${user.username}\n${user.email}`)
     res.json({update,message:`Successfully created ${club.clubName} new  committe`})
   } catch (error) {
-    console.log("error occur in change commitee")
   }
 }
 
@@ -627,9 +591,7 @@ const SearchClubs = async (req, res, next) => {
   try {
     const userId = req.userId; // Assuming you have userId available
     const user = await userCollection.findOne({ _id: userId });
-
     const { q } = req.query;
-    console.log("query -----", q);
     const regex = new RegExp(q, 'i');
     
     // Find clubs that match the search query
@@ -646,7 +608,6 @@ const SearchClubs = async (req, res, next) => {
 
     res.json(clubsWithUserRole);
   } catch (error) {
-    console.log("error in search:", error);
     res.status(500).json({ error: "An error occurred" });
   }
 };
@@ -655,7 +616,6 @@ const MakeRequest = async (req,res,next)=>{
   try {
     const userId=req.userId
     const {clubId}=req.body
-    console.log("///////////",userId,clubId);
     const user=await userCollection.findOne({_id:userId})
     const email=user.email
     await clubCollection.updateOne(
@@ -664,14 +624,12 @@ const MakeRequest = async (req,res,next)=>{
     );
     return res.json({message:"request done"})
   } catch (error) {
-    console.log("error occur in request making to join club");
   }
 
 }
 
 const FetchCount = async (req, res, next) => {
   const { clubName } = req.query;
-  console.log("777777777777777777", clubName);
   try {
     const club = await clubCollection.findOne({ clubName: clubName });
     if (!club) {
@@ -680,7 +638,6 @@ const FetchCount = async (req, res, next) => {
     const newMemberCount = club.newmember.length;
     res.json({ newMemberCount });
   } catch (error) {
-    console.error("Error fetching count:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 };
@@ -690,7 +647,6 @@ const LeaveClub=async(req,res,next)=>{
   try {
     const {clubName}=req.body
     const userId=req.userId
-    console.log("leave",clubName,userId);
     const club=await clubCollection.findOne({clubName:clubName})
     await userCollection.updateOne(
       { _id: userId },
@@ -708,7 +664,6 @@ const LeaveClub=async(req,res,next)=>{
  const PostLike = async (req,res,next)=>{
   const userId=req.userId
   const {clubName,postId}=req.body
-  console.log("likeee",userId,clubName,postId);
   const data = await postCollection.updateOne({_id:postId},{$addToSet:{likes:userId}})
   console.log(data);
   res.json({message:"setttt"})

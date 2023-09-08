@@ -18,7 +18,11 @@ const chatSchema = new mongoose.Schema({
       time:{
         type:Date,
         default:null
-      }
+      },
+      
+},{
+  timestamps: true
 });
 
 module.exports=mongoose.model("Chat",chatSchema);
+
