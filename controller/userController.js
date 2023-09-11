@@ -143,9 +143,9 @@ const SendEmail = async (req, res, next) => {
     }
     
      const token=oldUser.password   
-    
-    const link=`http://localhost:5173/reset-password?userId=${oldUser._id}&token=${token}`;
-
+    //  const url=process.env.Client_Side_URL
+    const link=`${process.env.Client_Side_URL}/reset-password?userId=${oldUser._id}&token=${token}`;
+   
     let mailTransporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
