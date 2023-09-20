@@ -12,12 +12,6 @@ const adminRouter = require('./routes/Admin');
 
 var app = express();
 
-
-// app.use(cors({
-//   origin: process.env.Client_Side_URL ,
-//   methods: ["GET", "POST"],
-//   credentials: true
-// }))
 app.use(cors({
   origin: process.env.Client_Side_URL || 'http://localhost:3000', 
   methods: ["GET", "POST"],
@@ -68,20 +62,11 @@ io.on('connection', (socket) => {
 });
 
 
-
-// error handler
 app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-  // render the error page
   res.status(err.status || 500);
   res.render('error');
 });
-
-// app.listen(process.env.PORT,()=>{
-//   console.log("server started port 4000")
-// })
 
 module.exports = app;
