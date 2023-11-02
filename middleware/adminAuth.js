@@ -10,7 +10,6 @@ const adminVerify = async (req, res, next) => {
     // if (!token) {
     //     return res.status(401).json({ message: 'Token not provided' });
     // }
-    // console.log("admin Token",token);
     try {
         const decodedToken = jwt.verify(token, process.env.jwtSecretKey);
         req.adminId = decodedToken.sub; 

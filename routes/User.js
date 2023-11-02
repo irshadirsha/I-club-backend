@@ -14,7 +14,7 @@ router.get('/',userController.userHome)
 
 router.post('/signup',userController.userSignup)
 router.post('/verify-otp',userController.VerifyOtp)
-
+router.get('/club-list',userController.GetAllClub)
 router.post('/login',userController.userLogin)
 router.post('/sendmail',userController.SendEmail)
 router.post('/reset-password',userController.ResetPassword)

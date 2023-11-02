@@ -1,4 +1,5 @@
 const userCollection =require ('../model/userModel')
+const clubCollection = require('../model/clubModel')
 const otpCollection = require ('../model/otpModel')
 const jwt = require('jsonwebtoken');
 const bcrypt =require('bcrypt')
@@ -82,6 +83,17 @@ const userSignup = async (req,res,next)=>{
    } catch (error) {
     res.json({ error, created: false });
    }
+}
+
+const GetAllClub=async(req,res,next)=>{
+      try {
+        const data=await clubCollection.find()
+        console.log("latest...",data)
+        res.json(data)
+      } catch (error) {
+        console.error(error);
+        return res.status(500).json({ errors: 'Internal server error' });
+      }
 }
 
 const VerifyOtp = async (req, res, next) => {
@@ -266,7 +278,8 @@ module.exports={ImageUpdate,
                 ResetPassword,
                 SetNewPass,
                 updateProfile,
-                GetProfile}
+                GetProfile,
+                GetAllClub}
 
 
 
